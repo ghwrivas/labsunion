@@ -24,6 +24,14 @@ model Usuario {
   fecha_nacimiento   DateTime 
   correo_electronico String   @unique
   role               Role     @default(ARBITRO)
+  contrasenia        String
+  activo             Boolean  @default(false)
+}
+
+model Estadio {
+  id                 Int      @id @default(autoincrement())
+  nombre             String
+  activo             Boolean  @default(false)
 }
 
 enum Role {
