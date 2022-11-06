@@ -19,19 +19,26 @@ model Todo {
 
 model Usuario {
   id                 Int      @id @default(autoincrement())
-  nombre             String
-  apellido           String
-  fecha_nacimiento   DateTime 
-  correo_electronico String   @unique
+  nombre             String   @db.VarChar(45)
+  apellido           String   @db.VarChar(45)
+  fecha_nacimiento   DateTime @db.Date
+  correo_electronico String   @unique @db.VarChar(45)
   role               Role     @default(ARBITRO)
-  contrasenia        String
+  contrasenia        String   @db.VarChar(100)
   activo             Boolean  @default(false)
 }
 
 model Estadio {
   id                 Int      @id @default(autoincrement())
-  nombre             String
+  nombre             String   @db.VarChar(45)
   activo             Boolean  @default(false)
+}
+
+model CategoriaJuego {
+  id      Int      @id @default(autoincrement())
+  nombre  String   @db.VarChar(45)
+  precio  Decimal  @db.Decimal(3,2)
+  activo  Boolean  @default(false)
 }
 
 enum Role {
