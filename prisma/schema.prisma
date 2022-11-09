@@ -32,6 +32,7 @@ model Estadio {
   id                 Int      @id @default(autoincrement())
   nombre             String   @db.VarChar(45)
   activo             Boolean  @default(false)
+  juegos             Juego[]
 }
 
 model CategoriaJuego {
@@ -39,12 +40,26 @@ model CategoriaJuego {
   nombre  String   @db.VarChar(45)
   precio  Decimal  @db.Decimal(3,2)
   activo  Boolean  @default(false)
+  juegos             Juego[]
 }
 
 model Periodo {
   id      Int      @id @default(autoincrement())
   anio    Int      @unique
   activo  Boolean  @default(false)
+}
+
+model Juego {
+  id                     Int             @id @default(autoincrement())
+  fecha                  DateTime        @db.Date
+  hora                   DateTime        @db.Time()
+  precio                 Decimal         @db.Decimal(3,2)
+  estadioId              Int 
+  estadio                Estadio         @relation(fields: [estadioId], references: [id])
+  categoriaJuegoId       Int
+  categoriaJuego         CategoriaJuego  @relation(fields: [categoriaJuegoId], references: [id])
+  comentarios            String?         @db.VarChar(100)
+  estatus                EstatusJuego    @default(PROGRAMADO)
 }
 
 enum Role {
@@ -54,4 +69,17 @@ enum Role {
   TESORERO
   SECRETARIO
   ADMIN
+}
+
+enum EstatusJuego {
+  PROGRAMADO
+  REALIZADO
+  SUSPENDIDO
+  REALIZADO_SIN_PAGO
+}
+
+enum TipoMovimiento {
+  PAGO_FINANZA
+  CAPITAL_INICIAL
+  GASTO
 }
