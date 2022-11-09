@@ -26,6 +26,7 @@ model Usuario {
   role               Role     @default(ARBITRO)
   contrasenia        String   @db.VarChar(100)
   activo             Boolean  @default(false)
+  usuarioJuegos      UsuarioJuego[]
 }
 
 model Estadio {
@@ -60,6 +61,15 @@ model Juego {
   categoriaJuego         CategoriaJuego  @relation(fields: [categoriaJuegoId], references: [id])
   comentarios            String?         @db.VarChar(100)
   estatus                EstatusJuego    @default(PROGRAMADO)
+  usuarioJuegos          UsuarioJuego[]
+}
+
+model UsuarioJuego {
+  id                     Int         @id @default(autoincrement())
+  usuarioId              Int 
+  usuario                Usuario     @relation(fields: [usuarioId], references: [id])
+  juegoId                Int
+  juego                  Juego       @relation(fields: [juegoId], references: [id])
 }
 
 enum Role {
