@@ -103,6 +103,25 @@ model AbonoCuentaCobrar {
   monto                  Decimal         @db.Decimal(5,2)
   cuentaCobrarId         Int 
   cuentaCobrar           CuentaCobrar    @relation(fields: [cuentaCobrarId], references: [id])
+  movimientoFinanzaAbonosCuentaCobrar MovimientoFinanzaAbonoCuentaCobrar[]
+}
+
+model MovimientoFinanza {
+  id                     Int             @id @default(autoincrement())
+  fecha                  DateTime        @db.Date
+  descripcion            String          @db.VarChar(100)
+  monto                  Decimal         @db.Decimal(5,2)
+  saldo                  Decimal         @db.Decimal(5,2)
+  tipo                   TipoMovimiento
+  movimientoFinanzaAbonosCuentaCobrar MovimientoFinanzaAbonoCuentaCobrar[]
+}
+
+model MovimientoFinanzaAbonoCuentaCobrar {
+  id                         Int                  @id @default(autoincrement())
+  movimientoFinanzaId        Int 
+  movimientoFinanza          MovimientoFinanza    @relation(fields: [movimientoFinanzaId], references: [id])
+  abonoCuentaCobrarId        Int
+  abonoCuentaCobrar          AbonoCuentaCobrar    @relation(fields: [abonoCuentaCobrarId], references: [id])
 }
 
 enum Role {
@@ -135,7 +154,7 @@ enum EstatusJuego {
 }
 
 enum TipoMovimiento {
-  PAGO_FINANZA
+  ABONO_CUENTA_COBRAR
   CAPITAL_INICIAL
   GASTO
 }
