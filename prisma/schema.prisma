@@ -27,6 +27,7 @@ model Usuario {
   contrasenia        String   @db.VarChar(100)
   activo             Boolean  @default(false)
   usuarioJuegos      UsuarioJuego[]
+  cuentasCobrar      CuentaCobrar[]
 }
 
 model Estadio {
@@ -45,9 +46,10 @@ model CategoriaJuego {
 }
 
 model Periodo {
-  id      Int      @id @default(autoincrement())
-  anio    Int      @unique
-  activo  Boolean  @default(false)
+  id      Int            @id @default(autoincrement())
+  anio    Int            @unique
+  activo  Boolean        @default(false)
+  cuentasCobrar          CuentaCobrar[]
 }
 
 model Juego {
@@ -62,6 +64,7 @@ model Juego {
   comentarios            String?         @db.VarChar(100)
   estatus                EstatusJuego    @default(PROGRAMADO)
   usuarioJuegos          UsuarioJuego[]
+  cuentaCobrarJuegos     CuentaCobrarJuego[]
 }
 
 model UsuarioJuego {
@@ -72,6 +75,36 @@ model UsuarioJuego {
   juego                  Juego       @relation(fields: [juegoId], references: [id])
 }
 
+model CuentaCobrar {
+  id                     Int                   @id @default(autoincrement())
+  monto                  Decimal               @db.Decimal(5,2)
+  descripcion            String                @db.VarChar(100)
+  usuarioId              Int   
+  usuario                Usuario               @relation(fields: [usuarioId], references: [id])
+  tipo                   TipoCuentaCobrar      @default(OTRO)
+  periodoId              Int   
+  periodo                Periodo               @relation(fields: [periodoId], references: [id])
+  cuentaCobrarJuegos     CuentaCobrarJuego[]
+  abonoCuentasCobrar     AbonoCuentaCobrar[]
+  estatus                EstatusCuentaCobrar   @default(PENDIENTE)
+}
+
+model CuentaCobrarJuego {
+  id                     Int             @id @default(autoincrement())
+  cuentaCobrarId         Int 
+  cuentaCobrar           CuentaCobrar    @relation(fields: [cuentaCobrarId], references: [id])
+  juegoId                Int
+  juego                  Juego           @relation(fields: [juegoId], references: [id])
+}
+
+model AbonoCuentaCobrar {
+  id                     Int             @id @default(autoincrement())
+  fecha                  DateTime        @db.Date
+  monto                  Decimal         @db.Decimal(5,2)
+  cuentaCobrarId         Int 
+  cuentaCobrar           CuentaCobrar    @relation(fields: [cuentaCobrarId], references: [id])
+}
+
 enum Role {
   ARBITRO
   COORDINADOR
@@ -80,6 +113,19 @@ enum Role {
   SECRETARIO
   ADMIN
 }
+
+enum TipoCuentaCobrar {
+  FINANZA_POR_JUEGO
+  VENTA_DE_ARTICULO
+  DEUDA_PERIODO_ANTERIOR
+  OTRO
+}
+
+enum EstatusCuentaCobrar {
+  PENDIENTE
+  PAGADO
+}
+
 
 enum EstatusJuego {
   PROGRAMADO
