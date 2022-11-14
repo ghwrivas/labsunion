@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Header from "../components/Header";
+import Navbar from "./NavBar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -27,7 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           padding-right: 1rem;
         }
       `}</style>
-      <Header />
+      <Navbar />
 
       <main>
         <div className="container">{children}</div>
