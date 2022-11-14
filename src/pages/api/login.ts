@@ -4,17 +4,23 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "../../lib/session";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/db";
+import { isSamePass, hashPass } from "../../lib/crypto-pass";
 
 async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
   const { username, password } = await req.body;
-  console.log(req.body);
-  console.log(sessionOptions);
   try {
-    const { nombre, role } = await prisma.usuario.findUniqueOrThrow({
-      where: {
-        correo_electronico: username,
-      },
-    });
+    const { nombre, contrasenia, role } =
+      await prisma.usuario.findUniqueOrThrow({
+        where: {
+          correo_electronico: username,
+        },
+      });
+    const isValidPass = await isSamePass(password, contrasenia);
+    if (!isValidPass) {
+      return res
+        .status(500)
+        .json({ message: "Usuario o contraseña inválidossss" });
+    }
     const user = {
       isLoggedIn: true,
       nombre,
@@ -25,8 +31,8 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     await req.session.save();
     res.json(user);
   } catch (error) {
-    console.log("loginRoute", error);
-    res.status(500).json({ message: (error as Error).message });
+    console.log(error)
+    res.status(500).json({ message: "Usuario o contraseña inválidos" });
   }
 }
 

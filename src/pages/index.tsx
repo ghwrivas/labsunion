@@ -1,7 +1,6 @@
 import { withIronSessionSsr } from "iron-session/next";
-import { InferGetServerSidePropsType, NextPage } from "next";
-import Head from "next/head";
-import { useMemo, useState } from "react";
+import { InferGetServerSidePropsType } from "next";
+import { useState } from "react";
 import { createTodo, deleteTodo, toggleTodo, useTodos } from "../api";
 import { sessionOptions } from "../lib/session";
 import styles from "../styles/Home.module.css";
