@@ -4,7 +4,10 @@ const prisma = new PrismaClient();
 async function main() {
   const miguelito = await prisma.usuario.upsert({
     where: { correo_electronico: "miguel.barco@gmail.com" },
-    update: {},
+    update: {
+      contrasenia:
+        "$2a$10$Rxuc7KPqemwrtezI3rdUCu8muZzExa2Ml3t9BTBgH1OS3xB8re47W",
+    },
     create: {
       nombre: "Miguel",
       apellido: "Barco",
@@ -16,7 +19,10 @@ async function main() {
 
   const gato = await prisma.usuario.upsert({
     where: { correo_electronico: "francisco.anza@gmail.com" },
-    update: {},
+    update: {
+      contrasenia:
+        "$2a$10$0F9sxTV3JmwVd1W0weQSv.NT3G5c9AYiCxpUX4x/iLTS59CsqzGxu",
+    },
     create: {
       nombre: "Francisco",
       apellido: "Anza",

@@ -1,9 +1,12 @@
-import { NextPage } from "next";
-import Head from "next/head";
-import { useMemo, useState } from "react";
+import { withIronSessionSsr } from "iron-session/next";
+import { InferGetServerSidePropsType } from "next";
+import { useState } from "react";
 import { createTodo, deleteTodo, toggleTodo, useTodos } from "../api";
+import { sessionOptions } from "../lib/session";
 import styles from "../styles/Home.module.css";
 import { Todo } from "../types";
+import { User } from "./api/user";
+import Layout from "../components/Layout";
 
 export const TodoList: React.FC = () => {
   const { data: todos, error } = useTodos();
@@ -17,7 +20,7 @@ export const TodoList: React.FC = () => {
 
   return (
     <ul className={styles.todoList}>
-      {todos.map(todo => (
+      {todos.map((todo) => (
         <TodoItem todo={todo} />
       ))}
     </ul>
@@ -49,7 +52,7 @@ const AddTodoInput = () => {
 
   return (
     <form
-      onSubmit={async e => {
+      onSubmit={async (e) => {
         e.preventDefault();
         createTodo(text);
         setText("");
@@ -60,36 +63,64 @@ const AddTodoInput = () => {
         className={styles.input}
         placeholder="Buy some milk"
         value={text}
-        onChange={e => setText(e.target.value)}
+        onChange={(e) => setText(e.target.value)}
       />
       <button className={styles.addButton}>Add</button>
     </form>
   );
 };
 
-const Home: NextPage = () => {
+const Home = ({
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Railway NextJS Prisma</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Layout>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <h2>Welcome to the home page {user.nombre}!</h2>
+          <h1 className={styles.title}>Todos</h1>
+          <h2 className={styles.desc}>
+            NextJS app connected to Postgres using Prisma and hosted on{" "}
+            <a href="https://railway.app">Railway</a>
+          </h2>
+        </header>
 
-      <header className={styles.header}>
-        <h1 className={styles.title}>Todos</h1>
-        <h2 className={styles.desc}>
-          NextJS app connected to Postgres using Prisma and hosted on{" "}
-          <a href="https://railway.app">Railway</a>
-        </h2>
-      </header>
+        <main className={styles.main}>
+          <AddTodoInput />
 
-      <main className={styles.main}>
-        <AddTodoInput />
-
-        <TodoList />
-      </main>
-    </div>
+          <TodoList />
+        </main>
+      </div>
+    </Layout>
   );
 };
 
 export default Home;
+
+export const getServerSideProps = withIronSessionSsr(async function ({
+  req,
+  res,
+}) {
+  const user = req.session.user;
+
+  if (user === undefined) {
+    res.setHeader("location", "/login");
+    res.statusCode = 302;
+    res.end();
+    return {
+      props: {
+        user: {
+          isLoggedIn: false,
+          nombre: "",
+          correo_electronico: "",
+          role: "",
+        } as User,
+      },
+    };
+  }
+
+  return {
+    props: { user: req.session.user },
+  };
+},
+sessionOptions);
