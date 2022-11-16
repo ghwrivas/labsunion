@@ -1,0 +1,15 @@
+-- AlterTable
+ALTER TABLE "AbonoCuentaCobrar" ALTER COLUMN "monto" SET DATA TYPE DECIMAL(6,2);
+
+-- AlterTable
+ALTER TABLE "CategoriaJuego" ALTER COLUMN "precio" SET DATA TYPE DECIMAL(5,2);
+
+-- AlterTable
+ALTER TABLE "CuentaCobrar" ALTER COLUMN "monto" SET DATA TYPE DECIMAL(6,2);
+
+-- AlterTable
+ALTER TABLE "Juego" ALTER COLUMN "precio" SET DATA TYPE DECIMAL(5,2);
+
+-- AlterTable
+ALTER TABLE "MovimientoFinanza" ALTER COLUMN "monto" SET DATA TYPE DECIMAL(6,2),
+ALTER COLUMN "saldo" SET DATA TYPE DECIMAL(7,2);

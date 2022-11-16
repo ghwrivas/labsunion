@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
-  const miguelito = await prisma.usuario.upsert({
+  await prisma.usuario.upsert({
     where: { correo_electronico: "miguel.barco@gmail.com" },
     update: {
       contrasenia:
@@ -31,7 +31,126 @@ async function main() {
       contrasenia: "elgato",
     },
   });
-  console.log({ miguelito, gato });
+
+  await prisma.estadio.createMany({
+    data: [
+      {
+        nombre: "Ali Primera",
+        activo: true,
+      },
+      {
+        nombre: "Ayacucho",
+        activo: true,
+      },
+      {
+        nombre: "Cuji",
+        activo: true,
+      },
+      {
+        nombre: "EMU",
+        activo: true,
+      },
+      {
+        nombre: "Eneal",
+        activo: true,
+      },
+      {
+        nombre: "INCE",
+        activo: true,
+      },
+      {
+        nombre: "Las Playitas",
+        activo: true,
+      },
+      {
+        nombre: "Las Tunas",
+        activo: true,
+      },
+      {
+        nombre: "Las Tunitas",
+        activo: true,
+      },
+      {
+        nombre: "Mama Zoila",
+        activo: true,
+      },
+      {
+        nombre: "Potrero",
+        activo: true,
+      },
+      {
+        nombre: "Sabana Grande",
+        activo: true,
+      },
+      {
+        nombre: "Santos Luzardo",
+        activo: true,
+      },
+      {
+        nombre: "Tamaca",
+        activo: true,
+      },
+      {
+        nombre: "Veritas",
+        activo: true,
+      },
+    ],
+  });
+
+  await prisma.categoriaJuego.createMany({
+    data: [
+      {
+        nombre: "Semilla",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Compota",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Pre-infantil",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Infantil",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Pre-junior",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Juvenil AA",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Juvenil AA",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Triple AAA",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Softball",
+        precio: 10.0,
+        activo: true,
+      },
+      {
+        nombre: "Baseball",
+        precio: 10.0,
+        activo: true,
+      },
+    ],
+  });
 }
 main()
   .then(async () => {
