@@ -1,11 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Juego, PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+import { prisma } from "../../lib/db";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
     const { fecha } = req.query;
+    if (!fecha) {
+      res.json([]);
+      return;
+    }
     const juegos = await prisma.juego.findMany({
       where: {
         fecha: new Date(fecha as string),
@@ -17,10 +20,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           },
         },
         estadio: {},
+        categoriaJuego: {},
       },
-      orderBy: {
-        fecha: "desc",
-      },
+      orderBy: [
+        {
+          estadioId: "asc",
+        },
+        {
+          hora: "asc",
+        },
+      ],
     });
     const juegosCleaned = juegos.map((juego) => {
       let juegoCleaned: any = {
@@ -30,6 +39,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         precio: Number(juego.precio),
         estatus: juego.estatus,
         estadio: { ...juego.estadio },
+        categoriaJuego: { ...juego.categoriaJuego },
       };
       juegoCleaned.arbitros = juego.usuarioJuegos.map((usuarioJuego) => {
         return {
@@ -43,26 +53,41 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.json(juegosCleaned);
   } else if (req.method === "POST") {
     try {
-      const { estadioId, categoriaJuegoId, fecha, precio } = req.body;
+      const { estadio, categoria, fecha, precio, arbitros } = JSON.parse(
+        req.body
+      );
       const fechaToDate = new Date(fecha as string);
-      const juego = await prisma.juego.create({
-        data: {
-          estadio: {
-            connect: { id: estadioId },
-          },
-          categoriaJuego: {
-            connect: {
-              id: categoriaJuegoId,
+
+      const juego = await prisma.$transaction(async (tx) => {
+        const juego = await tx.juego.create({
+          data: {
+            estadio: {
+              connect: { id: Number(estadio) },
             },
+            categoriaJuego: {
+              connect: {
+                id: Number(categoria),
+              },
+            },
+            precio,
+            fecha: fechaToDate,
+            hora: fechaToDate,
           },
-          precio,
-          fecha: fechaToDate,
-          hora: fechaToDate,
-        },
+        });
+
+        if (arbitros.length) {
+          const data = arbitros.map((arbitro) => {
+            return { juegoId: juego.id, usuarioId: arbitro.id };
+          });
+          await tx.usuarioJuego.createMany({
+            data,
+          });
+        }
+        console.log("juego", juego);
+        return juego;
       });
       res.json(juego);
     } catch (error) {
-      console.log(error);
       res.status(500).json({ status: "error" });
     }
   } else if (req.method === "PUT") {
