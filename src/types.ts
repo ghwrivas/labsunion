@@ -49,3 +49,12 @@ export interface JuegoCreateData {
   precio: number;
   arbitros: Arbitro[];
 }
+
+export interface JuegoEditData {
+  id: string;
+  fecha: string;
+  estadio: string;
+  categoria: string;
+  precio: number;
+  arbitros: Arbitro[];
+}

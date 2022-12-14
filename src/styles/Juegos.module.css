@@ -11,7 +11,7 @@
 .juegosGrid {
   max-width: 1000px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   grid-gap: 2em;
   color: #222;
   font-size: large;
@@ -63,7 +63,6 @@
   .gridCell {
     margin-top: -10px;
     order: 1;
-    display: flex;
   }
 
   .gridCell::before {

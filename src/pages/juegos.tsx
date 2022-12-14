@@ -1,6 +1,7 @@
 import { withIronSessionSsr } from "iron-session/next";
 import { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useJuegos } from "../api-juegos";
 import Layout from "../components/Layout";
@@ -10,7 +11,13 @@ import { Arbitro, Juego } from "../types";
 import { User } from "./api/user";
 
 export const JuegoList: React.FC = () => {
-  const [fecha, setFecha] = useState("");
+  const router = useRouter();
+  let {
+    query: { fecha: fechaToFilter },
+  } = router;
+
+
+  const [fecha, setFecha] = useState(fechaToFilter as string || '');
   const { data: juegos, error } = useJuegos(fecha);
 
   if (error != null) return <div>Error cargando juegos...</div>;
@@ -82,6 +89,16 @@ const JuegoItem: React.FC<{ juego: Juego }> = ({ juego }) => (
       ) : (
         "Sin árbitros asignados"
       )}
+    </div>
+    <div className={styles.gridCell}>
+    <Link
+      href={{
+        pathname: "/juegos/edit",
+        query: { juegoId: juego.id },
+      }}
+    >
+      <a>Editar</a>
+    </Link>
     </div>
   </div>
 );
