@@ -4,7 +4,43 @@ import { prisma } from "../../lib/db";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
-    const { fecha } = req.query;
+    const { fecha, juegoId } = req.query;
+    if (juegoId) {
+      const id = Number(juegoId);
+      const juego = await prisma.juego.findFirst({
+        where: {
+          id,
+        },
+        include: {
+          usuarioJuegos: {
+            include: {
+              usuario: {},
+            },
+          },
+          estadio: {},
+          categoriaJuego: {},
+        },
+      });
+
+      let juegoCleaned: any = {
+        id: juego.id,
+        hora: juego.hora,
+        fecha: juego.fecha,
+        precio: Number(juego.precio),
+        estatus: juego.estatus,
+        estadio: { ...juego.estadio },
+        categoriaJuego: { ...juego.categoriaJuego },
+      };
+      juegoCleaned.arbitros = juego.usuarioJuegos.map((usuarioJuego) => {
+        return {
+          id: usuarioJuego.usuario.id,
+          nombre: usuarioJuego.usuario.nombre,
+          apellido: usuarioJuego.usuario.apellido,
+        };
+      });
+      res.json(juegoCleaned);
+      return;
+    }
     if (!fecha) {
       res.json([]);
       return;
@@ -93,34 +129,49 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } else if (req.method === "PUT") {
     try {
       const id = Number(req.query.juegoId);
-      const { estadioId, categoriaJuegoId, fecha } = req.body;
+      const { estadio, categoria, fecha, precio, arbitros } = JSON.parse(
+        req.body
+      );
       const fechaToDate = new Date(fecha as string);
-      const juego = await prisma.juego.update({
-        where: {
-          id,
-        },
-        data: {
-          estadio: {
-            connect: { id: estadioId },
+      const juego = await prisma.$transaction(async (tx) => {
+        const juego = await tx.juego.update({
+          where: {
+            id,
           },
-          categoriaJuego: {
-            connect: {
-              id: categoriaJuegoId,
+          data: {
+            estadio: {
+              connect: { id: Number(estadio) },
             },
+            categoriaJuego: {
+              connect: {
+                id: Number(categoria),
+              },
+            },
+            precio,
+            fecha: fechaToDate,
+            hora: fechaToDate,
           },
-          fecha: fechaToDate,
-          hora: fechaToDate,
-        },
+        });
+
+        if (arbitros.length) {
+          await tx.usuarioJuego.deleteMany({ where: { juegoId: juego.id } });
+
+          const data = arbitros.map((arbitro) => {
+            return { juegoId: juego.id, usuarioId: arbitro.id };
+          });
+          await tx.usuarioJuego.createMany({
+            data,
+          });
+        }
+        return juego;
       });
       res.json(juego);
     } catch (error) {
       res.status(500).json({ status: "error" });
     }
   } else if (req.method === "DELETE") {
-    // delete todo
-    const id = req.query.todoId as string;
-    await prisma.todo.delete({ where: { id } });
-
+    const id = Number(req.query.juegoId);
+    await prisma.juego.delete({ where: { id } });
     res.json({ status: "ok" });
   }
 };
