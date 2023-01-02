@@ -11,7 +11,7 @@
 .juegosGrid {
   max-width: 1000px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
   grid-gap: 2em;
   color: #222;
   font-size: large;
@@ -32,6 +32,13 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
+}
+
+.actions {
+  float: right;
+}
+.actions a {
+  margin-right: 0.5rem;
 }
 
 .arbitrosList {
