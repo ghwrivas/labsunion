@@ -3,7 +3,7 @@ import { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useJuegos } from "../api-juegos";
+import { deleteJuego, useJuegos } from "../api-juegos";
 import Layout from "../components/Layout";
 import { sessionOptions } from "../lib/session";
 import styles from "../styles/Juegos.module.css";
@@ -16,8 +16,7 @@ export const JuegoList: React.FC = () => {
     query: { fecha: fechaToFilter },
   } = router;
 
-
-  const [fecha, setFecha] = useState(fechaToFilter as string || '');
+  const [fecha, setFecha] = useState((fechaToFilter as string) || "");
   const { data: juegos, error } = useJuegos(fecha);
 
   if (error != null) return <div>Error cargando juegos...</div>;
@@ -54,6 +53,7 @@ export const JuegoList: React.FC = () => {
         <label>Hora</label>
         <label>Categoría</label>
         <label>Árbitros</label>
+        <label>Estatus</label>
       </div>
       {juegos.map((juego) => (
         <JuegoItem juego={juego} key={juego.id} />
@@ -90,18 +90,39 @@ const JuegoItem: React.FC<{ juego: Juego }> = ({ juego }) => (
         "Sin árbitros asignados"
       )}
     </div>
+    <div className={styles.gridCell} data-name="Estatus: ">
+      {juego.estatus}
+    </div>
     <div className={styles.gridCell}>
-    <Link
-      href={{
-        pathname: "/juegos/edit",
-        query: { juegoId: juego.id },
-      }}
-    >
-      <a>Editar</a>
-    </Link>
+      <div className={styles.actions}>
+        <Link
+          href={{
+            pathname: "/juegos/edit",
+            query: { juegoId: juego.id },
+          }}
+        >
+          <a>Editar</a>
+        </Link>
+        &nbsp;
+        <Link href="#">
+          <a onClick={(e) => handleDelete(juego)}>Eliminar</a>
+        </Link>
+        &nbsp;
+      </div>
     </div>
   </div>
 );
+
+async function handleDelete(juego: Juego) {
+  if (confirm("Esta seguro que desea eliminar el juego?") == true) {
+    try {
+      await deleteJuego(juego);
+      alert("Juego eliminado!!!");
+    } catch (error) {
+      alert("Ocurrió un error al eliminar el juego");
+    }
+  }
+}
 
 function getHoraJuego(hora) {
   const date = new Date(hora);

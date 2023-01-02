@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import fetchJson from "./lib/fetchJson";
 import { Juego, JuegoCreateData, JuegoEditData } from "./types";
 
@@ -31,4 +31,17 @@ export const editJuego = async (juegoEditData: JuegoEditData) => {
   if (response.status === 500) {
     throw new Error("error al editar juego");
   }
+};
+
+export const deleteJuego = async (juego: Juego) => {
+  const fechaJuego = juego.fecha.substring(0, 10);
+  mutate(
+    `${juegosPath}?fecha=${fechaJuego}`,
+    (juegos) => juegos.filter((j) => j.id !== juego.id),
+    false
+  );
+  await fetch(`${juegosPath}?juegoId=${juego.id}`, {
+    method: "DELETE",
+  });
+  mutate(`${juegosPath}?fecha=${fechaJuego}`);
 };

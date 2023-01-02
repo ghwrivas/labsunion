@@ -32,14 +32,14 @@ model Usuario {
 
 model Estadio {
   id                 Int      @id @default(autoincrement())
-  nombre             String   @db.VarChar(45)
+  nombre             String   @db.VarChar(45) @unique
   activo             Boolean  @default(false)
   juegos             Juego[]
 }
 
 model CategoriaJuego {
   id      Int      @id @default(autoincrement())
-  nombre  String   @db.VarChar(45)
+  nombre  String   @db.VarChar(45) @unique
   precio  Decimal  @db.Decimal(5,2)
   activo  Boolean  @default(false)
   juegos             Juego[]
@@ -72,7 +72,7 @@ model UsuarioJuego {
   usuarioId              Int 
   usuario                Usuario     @relation(fields: [usuarioId], references: [id])
   juegoId                Int
-  juego                  Juego       @relation(fields: [juegoId], references: [id])
+  juego                  Juego       @relation(fields: [juegoId], references: [id], onDelete: Cascade)
 }
 
 model CuentaCobrar {

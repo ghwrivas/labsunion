@@ -1,3 +1,4 @@
+import { EstatusJuego } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../lib/db";
@@ -45,6 +46,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.json([]);
       return;
     }
+    console.log('fecha', new Date(fecha as string))
     const juegos = await prisma.juego.findMany({
       where: {
         fecha: new Date(fecha as string),
@@ -170,8 +172,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).json({ status: "error" });
     }
   } else if (req.method === "DELETE") {
-    const id = Number(req.query.juegoId);
-    await prisma.juego.delete({ where: { id } });
-    res.json({ status: "ok" });
+    try {
+      const juegoId = Number(req.query.juegoId);
+      await prisma.$transaction(async (tx) => {
+        const id = Number(juegoId);
+        const juego = await tx.juego.findFirst({
+          where: {
+            id,
+          },
+        });
+        if (juego.estatus === EstatusJuego.PROGRAMADO) {
+          await tx.juego.delete({ where: { id } });
+        }
+      });
+      res.json({ status: "ok" });
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ status: "error" });
+    }
   }
 };
