@@ -45,3 +45,13 @@ export const deleteJuego = async (juego: Juego) => {
   });
   mutate(`${juegosPath}?fecha=${fechaJuego}`);
 };
+
+export const changeStatus = async (juegoEditData: JuegoEditData) => {
+  const response = await fetch(`${juegosPath}?juegoId=${juegoEditData.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ estatus: juegoEditData.estatus }),
+  });
+  if (response.status === 500) {
+    throw new Error("error actualizando estatus");
+  }
+};

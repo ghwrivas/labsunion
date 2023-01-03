@@ -95,19 +95,39 @@ const JuegoItem: React.FC<{ juego: Juego }> = ({ juego }) => (
     </div>
     <div className={styles.gridCell}>
       <div className={styles.actions}>
-        <Link
-          href={{
-            pathname: "/juegos/edit",
-            query: { juegoId: juego.id },
-          }}
-        >
-          <a>Editar</a>
-        </Link>
+        {juego.estatus == "PROGRAMADO" || juego.estatus == "SUSPENDIDO" ? (
+          <Link
+            href={{
+              pathname: "/juegos/edit",
+              query: { juegoId: juego.id },
+            }}
+          >
+            <a>Editar</a>
+          </Link>
+        ) : (
+          ""
+        )}
         &nbsp;
-        <Link href="#">
-          <a onClick={(e) => handleDelete(juego)}>Eliminar</a>
-        </Link>
+        {juego.estatus == "PROGRAMADO" ? (
+          <Link href="">
+            <a onClick={(e) => handleDelete(juego)}>Eliminar</a>
+          </Link>
+        ) : (
+          ""
+        )}
         &nbsp;
+        {juego.estatus == "PROGRAMADO" || juego.estatus == "SUSPENDIDO" ? (
+          <Link
+            href={{
+              pathname: "/juegos/status",
+              query: { juegoId: juego.id },
+            }}
+          >
+            <a>Estatus</a>
+          </Link>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   </div>

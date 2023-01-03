@@ -54,6 +54,7 @@ export interface JuegoEditData {
   id: string;
   fecha: string;
   estadio: string;
+  estatus?: string;
   categoria: string;
   precio: number;
   arbitros: Arbitro[];

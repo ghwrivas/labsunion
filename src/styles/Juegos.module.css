@@ -51,6 +51,10 @@
   padding: 0.5rem;
 }
 
+.info {
+  width: 20rem;
+}
+
 @media (max-width: 600px) {
   .juegosGrid {
     grid-template-columns: 1fr;
