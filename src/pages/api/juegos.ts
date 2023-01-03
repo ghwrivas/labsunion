@@ -46,7 +46,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.json([]);
       return;
     }
-    console.log('fecha', new Date(fecha as string))
     const juegos = await prisma.juego.findMany({
       where: {
         fecha: new Date(fecha as string),
@@ -187,7 +186,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       });
       res.json({ status: "ok" });
     } catch (error) {
-      console.log(error)
+      res.status(500).json({ status: "error" });
+    }
+  } else if (req.method === "PATCH") {
+    try {
+      const juegoId = Number(req.query.juegoId);
+      const { estatus } = JSON.parse(req.body);
+      await prisma.$transaction(async (tx) => {
+        const id = Number(juegoId);
+        const juego = await tx.juego.findFirst({
+          where: {
+            id,
+          },
+        });
+        if (
+          juego.estatus === EstatusJuego.PROGRAMADO ||
+          juego.estatus === EstatusJuego.SUSPENDIDO
+        ) {
+          await tx.juego.update({ where: { id }, data: { estatus } });
+        }
+      });
+      res.json({ status: "ok" });
+    } catch (error) {
       res.status(500).json({ status: "error" });
     }
   }
