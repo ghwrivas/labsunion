@@ -15,9 +15,11 @@
   "dependencies": {
     "@prisma/client": "4.8.0",
     "bcrypt": "^5.1.0",
+    "bootstrap": "^5.2.3",
     "iron-session": "^6.3.1",
     "next": "12.1.0",
     "react": "17.0.1",
+    "react-bootstrap": "^2.7.0",
     "react-dom": "17.0.1",
     "swr": "^0.4.1"
   },

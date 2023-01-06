@@ -22,16 +22,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           categoriaJuego: {},
         },
       });
+      const fechaIsoString = juego.fecha.toISOString().substring(0, 11);
+      const horaToIsoString = juego.hora.toISOString().substring(11);
+      const fechaUTC = new Date(fechaIsoString+horaToIsoString);
+      const horaLocale = fechaUTC.toLocaleString().substring(11)
 
       let juegoCleaned: any = {
         id: juego.id,
         hora: juego.hora,
-        fecha: juego.fecha,
+        fecha: fechaIsoString+horaLocale+'.000Z',
         precio: Number(juego.precio),
         estatus: juego.estatus,
         estadio: { ...juego.estadio },
         categoriaJuego: { ...juego.categoriaJuego },
       };
+      console.log(juegoCleaned)
       juegoCleaned.arbitros = juego.usuarioJuegos.map((usuarioJuego) => {
         return {
           id: usuarioJuego.usuario.id,
@@ -134,6 +139,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         req.body
       );
       const fechaToDate = new Date(fecha as string);
+      console.log(fechaToDate, fecha)
       const juego = await prisma.$transaction(async (tx) => {
         const juego = await tx.juego.update({
           where: {

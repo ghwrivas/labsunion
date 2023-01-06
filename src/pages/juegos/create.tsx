@@ -1,6 +1,6 @@
 import { withIronSessionSsr } from "iron-session/next";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { useArbitros } from "../../api-arbitros";
 import { useCategorias } from "../../api-categorias";
 import { sessionOptions } from "../../lib/session";
@@ -10,6 +10,8 @@ import Layout from "../../components/Layout";
 import { useEstadios } from "../../api-estadios";
 import styles from "../../styles/Juegos.module.css";
 import { createJuego } from "../../api-juegos";
+import Form from "react-bootstrap/Form";
+import { Button, Spinner } from "react-bootstrap";
 
 export const JuegoCreateForm: React.FC = () => {
   const router = useRouter();
@@ -31,6 +33,10 @@ export const JuegoCreateForm: React.FC = () => {
     arbitros: [],
   });
 
+  useEffect(() => {
+    setDatos(datos);
+  }, [datos]);
+
   const { data: arbitros, error: errorArbitros } = useArbitros();
   const { data: categorias, error: errorCategorias } = useCategorias();
   const { data: estadios, error: errorEstadios } = useEstadios();
@@ -51,7 +57,7 @@ export const JuegoCreateForm: React.FC = () => {
   const handleSelectChange = (event) => {
     const index = event.target.selectedIndex;
     const el = event.target.childNodes[index];
-    const option = el.getAttribute("id");
+    const option = el.getAttribute("value") || "";
     setDatos({
       ...datos,
       [event.target.name]: option,
@@ -59,10 +65,9 @@ export const JuegoCreateForm: React.FC = () => {
   };
 
   const handleCategoriaSelectChange = (event) => {
-    event.preventDefault();
     const index = event.target.selectedIndex;
     const el = event.target.childNodes[index];
-    const option = el.getAttribute("id");
+    const option = el.getAttribute("value") || "";
     if (!option) return;
     const categoria = categorias.find((categoria) => {
       return categoria.id === Number(option);
@@ -70,32 +75,31 @@ export const JuegoCreateForm: React.FC = () => {
     setDatos({
       ...datos,
       precio: Number(categoria.precio),
-      [event.target.name]: Number(option),
+      [event.target.name]: option,
     });
   };
 
   const handleArbitroSelectChange = (event) => {
-    event.preventDefault();
     const index = event.target.selectedIndex;
     const el = event.target.childNodes[index];
     const option = el.getAttribute("id");
     if (!option) return;
+    const optionToNumber = Number(option);
     const arbitroFound = datos.arbitros.find((arbitro) => {
-      return arbitro.id === Number(option);
+      return arbitro.id === optionToNumber;
     });
     if (arbitroFound) return;
     const arbitro = arbitros.find((arbitro) => {
-      return arbitro.id === Number(option);
+      return arbitro.id === optionToNumber;
     });
     datos.arbitros.push(arbitro);
     setDatos({
       ...datos,
-      [event.target.name]: Number(option),
+      [event.target.name]: optionToNumber,
     });
   };
 
-  const eliminarArbitro = (id, event) => {
-    event.preventDefault();
+  const eliminarArbitro = (id) => {
     const arbitros = datos.arbitros.filter((arbitro) => {
       return arbitro.id !== id;
     });
@@ -126,61 +130,65 @@ export const JuegoCreateForm: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Registrar juego</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="fecha">Fecha y hora</label>
-        <input
-          id="fecha"
-          name="fecha"
+    <Form onSubmit={handleSubmit}>
+      <h4>Crear juego</h4>
+      <Form.Group className="mb-3" controlId="formBasicFecha">
+        <Form.Label>Fecha y hora</Form.Label>
+        <Form.Control
           type="datetime-local"
-          placeholder="Fecha"
+          placeholder="Fecha y hora"
+          name="fecha"
           value={datos.fecha}
           required
           onChange={handleInputChange}
         />
-        <label htmlFor="estadio">Estadio</label>
-        <select
-          id="estadio"
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="formBasicEstadio">
+        <Form.Label>Estadio</Form.Label>
+        <Form.Select
           name="estadio"
           required
-          placeholder="Seleccione el estadio"
+          value={datos.estadio}
           onChange={handleSelectChange}
         >
           <option id={null} value="" key="">
             Seleccione
           </option>
           {estadios.map((estadio) => (
-            <option id={"" + estadio.id} key={estadio.id}>
+            <option value={"" + estadio.id} key={estadio.id}>
               {estadio.nombre}
             </option>
           ))}
-        </select>
-        <label htmlFor="categoria">Categoría</label>
-        <select
-          id="categoria"
+        </Form.Select>
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="formBasicCategoria">
+        <Form.Label>Categoría</Form.Label>
+        <Form.Select
           name="categoria"
+          aria-label="Default select example"
           required
+          value={datos.categoria}
           onChange={handleCategoriaSelectChange}
         >
           <option id={null} value="" key="">
             Seleccione
           </option>
           {categorias.map((categoria) => (
-            <option id={"" + categoria.id} key={categoria.id}>
+            <option value={"" + categoria.id} key={categoria.id}>
               {categoria.nombre}
             </option>
           ))}
-        </select>
-        <p>Asignar árbitros ahora o puede asignarlos más tarde</p>
-        <label htmlFor="arbitro">Agregar árbitros</label>
-        <select
-          id="arbitro"
+        </Form.Select>
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="formBasicArbitro">
+        <Form.Label>Agregar árbitros</Form.Label>
+        <Form.Select
           name="arbitro"
+          aria-label="Default select example"
           required
           onChange={handleArbitroSelectChange}
         >
-          <option id={null} value="" key="">
+          <option value={""} key="">
             Seleccione
           </option>
           {arbitros.map((arbitro) => (
@@ -188,37 +196,67 @@ export const JuegoCreateForm: React.FC = () => {
               {arbitro.nombre}
             </option>
           ))}
-        </select>
-        {datos.arbitros.length ? (
-          <div className={styles.arbitrosList}>
-            {datos.arbitros.map((arbitro) => (
-              <div className={styles.arbitroItem} key={arbitro.id}>
-                <span>
-                  {arbitro.nombre} {arbitro.apellido}
-                </span>
-                <button onClick={(event) => eliminarArbitro(arbitro.id, event)}>
-                  Eliminar
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          "Sin árbitros asignados"
-        )}
-        <button className={styles.addButton} disabled={loading}>Guardar</button>
-      </form>
-    </div>
+        </Form.Select>
+        <Form.Text className="text-muted">
+          También puedes asignar los árbitros el dia de la coordinación.
+        </Form.Text>
+      </Form.Group>
+      {datos.arbitros.length ? (
+        <div className={styles.arbitrosList}>
+          {datos.arbitros.map((arbitro) => (
+            <div className={styles.arbitroItem} key={arbitro.id}>
+              <span>
+                {arbitro.nombre} {arbitro.apellido}
+              </span>
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={(event) => eliminarArbitro(arbitro.id)}
+              >
+                Eliminar
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <Form.Text className="text-muted">
+          No hay árbitros seleccionados.
+        </Form.Text>
+      )}
+      <br></br>
+      <div className="mx-auto .mt-1" style={{ width: "200px" }}>
+        <Button
+          style={{ width: "200px" }}
+          variant="primary"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? (
+            <div>
+              <Spinner
+                as="span"
+                animation="grow"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              ></Spinner>
+              Enviando...
+            </div>
+          ) : (
+            "Guardar"
+          )}
+        </Button>
+      </div>
+    </Form>
   );
 };
 
 const Juegos = () => {
   return (
     <Layout>
-      <div className="container-form">
-        <main>
-          <JuegoCreateForm key="form" />
-        </main>
-      </div>
+      <main>
+        <JuegoCreateForm key="form" />
+      </main>
     </Layout>
   );
 };

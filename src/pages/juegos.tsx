@@ -154,11 +154,9 @@ const Juegos = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <Layout>
-      <div>
-        <main>
-          <JuegoList />
-        </main>
-      </div>
+      <main>
+        <JuegoList />
+      </main>
     </Layout>
   );
 };

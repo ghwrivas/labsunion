@@ -19,7 +19,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     if (!isValidPass) {
       return res
         .status(500)
-        .json({ message: "Usuario o contraseña inválidos" });
+        .json({ message: "Correo electrónico o contraseña inválidos" });
     }
     const user = {
       isLoggedIn: true,
@@ -31,8 +31,9 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     await req.session.save();
     res.json(user);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Usuario o contraseña inválidos" });
+    res
+      .status(500)
+      .json({ message: "Correo electrónico o contraseña inválidos" });
   }
 }
 

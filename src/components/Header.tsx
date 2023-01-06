@@ -1,8 +1,10 @@
-import Link from "next/link";
 import useUser from "../lib/useUser";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import fetchJson from "../lib/fetchJson";
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
 
 export default function Header() {
   const { user, mutateUser } = useUser();
@@ -10,70 +12,51 @@ export default function Header() {
 
   return (
     <header>
-      <nav>
-        <ul>
-          <li>
-            <Link href="/">
-              <a>Home</a>
-            </Link>
-          </li>
-          {user?.isLoggedIn === false && (
-            <li>
-              <Link href="/login">
-                <a>Login</a>
-              </Link>
-            </li>
-          )}
-          {user?.isLoggedIn === true && (
-            <>
-              <li>
-                <a
-                  href="/api/logout"
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    mutateUser(
-                      await fetchJson("/api/logout", { method: "POST" }),
-                      false
-                    );
-                    router.push("/login");
-                  }}
-                >
-                  Logout
-                </a>
-              </li>
-            </>
-          )}
-        </ul>
-      </nav>
-      <style jsx>{`
-        ul {
-          display: flex;
-          list-style: none;
-          margin-left: 0;
-          padding-left: 0;
-        }
-        li {
-          margin-right: 1rem;
-          display: flex;
-        }
-        li:first-child {
-          margin-left: auto;
-        }
-        a {
-          color: #fff;
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-        }
-        a img {
-          margin-right: 1em;
-        }
-        header {
-          padding: 0.2rem;
-          color: #fff;
-          background-color: #333;
-        }
-      `}</style>
+      <Navbar bg="light" expand="lg">
+        <Container>
+          <Navbar.Brand href="/">LABSUNION</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link href="/">Inicio</Nav.Link>
+              <NavDropdown title="Coordinación" id="basic-nav-dropdown">
+                <NavDropdown.Item href="/juegos">
+                  Buscar juegos
+                </NavDropdown.Item>
+                <NavDropdown.Item href="/juegos/create">
+                  Crear juego
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          </Navbar.Collapse>
+          <Navbar.Collapse className="justify-content-end">
+            {user?.isLoggedIn === false && (
+              <Nav.Link href="/login" className="text-end">
+                Iniciar Sesión
+              </Nav.Link>
+            )}
+          </Navbar.Collapse>
+          <Navbar.Collapse className="justify-content-end">
+            {user?.isLoggedIn === true && (
+              <Nav.Link
+                href="/api/logout"
+                className="text-end"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  mutateUser(
+                    await fetchJson("/api/logout", { method: "POST" }),
+                    false
+                  );
+                  router.push("/login");
+                }}
+              >
+                Cerrar Sesión
+              </Nav.Link>
+            )}
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      <br></br>
     </header>
   );
 }
