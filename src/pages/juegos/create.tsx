@@ -8,10 +8,13 @@ import { JuegoCreateData } from "../../types";
 import { User } from "../api/user";
 import Layout from "../../components/Layout";
 import { useEstadios } from "../../api-estadios";
-import styles from "../../styles/Juegos.module.css";
 import { createJuego } from "../../api-juegos";
 import Form from "react-bootstrap/Form";
-import { Button, Spinner } from "react-bootstrap";
+import {
+  Button,
+  ListGroup,
+  Spinner,
+} from "react-bootstrap";
 
 export const JuegoCreateForm: React.FC = () => {
   const router = useRouter();
@@ -35,6 +38,7 @@ export const JuegoCreateForm: React.FC = () => {
 
   useEffect(() => {
     setDatos(datos);
+    console.log(datos.arbitros)
   }, [datos]);
 
   const { data: arbitros, error: errorArbitros } = useArbitros();
@@ -104,6 +108,7 @@ export const JuegoCreateForm: React.FC = () => {
       return arbitro.id !== id;
     });
     datos.arbitros = arbitros;
+    console.log('AAA', datos.arbitros)
     setDatos({
       ...datos,
     });
@@ -202,22 +207,21 @@ export const JuegoCreateForm: React.FC = () => {
         </Form.Text>
       </Form.Group>
       {datos.arbitros.length ? (
-        <div className={styles.arbitrosList}>
+        <ListGroup>
           {datos.arbitros.map((arbitro) => (
-            <div className={styles.arbitroItem} key={arbitro.id}>
-              <span>
-                {arbitro.nombre} {arbitro.apellido}
-              </span>
+            <ListGroup.Item key={arbitro.id}>
+              {arbitro.nombre} {arbitro.apellido}
               <Button
+                style={{ float: "right" }}
                 variant="secondary"
                 type="button"
                 onClick={(event) => eliminarArbitro(arbitro.id)}
               >
                 Eliminar
               </Button>
-            </div>
+            </ListGroup.Item>
           ))}
-        </div>
+        </ListGroup>
       ) : (
         <Form.Text className="text-muted">
           No hay árbitros seleccionados.

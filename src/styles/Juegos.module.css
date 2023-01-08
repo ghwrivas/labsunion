@@ -1,41 +1,6 @@
-.container {
-  display: flex;
-  flex-flow: column;
-}
-
-.container a{
-  float: right;
-  text-align: right;
-}
-
-.juegosGrid {
-  max-width: 1000px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-  grid-gap: 2em;
-  color: #222;
-  font-size: large;
-  border-bottom: 1px solid #ddd;
-  padding: 1em 0;
-}
-
-.juegosGrid label {
-  font-weight: 800;
-}
-
-.gridHeader {
-  text-decoration: underline;
-  border-bottom: unset; 
-}
-
-.gridCell ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
 .actions {
   float: right;
+  font-size: smaller;
 }
 .actions a {
   margin-right: 0.5rem;
@@ -55,37 +20,24 @@
   width: 20rem;
 }
 
-@media (max-width: 600px) {
-  .juegosGrid {
-    grid-template-columns: 1fr;
-    grid-gap: 0.5em;
-    padding: 8px;
-    margin: 0.1rem 0 0.4rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.8rem;
-  }
-  
-  .juegosGrid label:first-child {
-    text-align: left;
-    margin: 0;
-  }
+.addButton {
+  position: fixed;
+  z-index: 1000;
+  right: 0;
+  height: 60px;
+  width: 60px;
+  line-height: 55px;
+  font-size: 2em;
+  font-weight: bold;
+  border-radius: 50%;
+  background-color: #0d6efd;
+  color: white;
+  text-align: center;
+  top: 12rem;
+}
 
-  .gridCell {
-    margin-top: -10px;
-    order: 1;
-  }
-
-  .gridCell::before {
-    content: attr(data-name);
-  }
-  
-  .gridHeader {
-    display: none;
-  }
-
-  .gridCell ul li {
-    margin-left: 1rem;
-  }
-  
+.addButton > a {
+  display: block;
+  text-decoration: none;
+  color: white;
 }

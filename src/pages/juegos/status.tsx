@@ -54,8 +54,6 @@ export const ChangeStatusForm: React.FC = () => {
 
   if (loadingJuego == true) return <div>Cargando...</div>;
 
-  console.log("datos", JSON.stringify(datos));
-
   const handleSelectChange = (event) => {
     const index = event.target.selectedIndex;
     const el = event.target.childNodes[index];

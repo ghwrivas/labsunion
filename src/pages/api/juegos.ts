@@ -36,7 +36,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         estadio: { ...juego.estadio },
         categoriaJuego: { ...juego.categoriaJuego },
       };
-      console.log(juegoCleaned)
       juegoCleaned.arbitros = juego.usuarioJuegos.map((usuarioJuego) => {
         return {
           id: usuarioJuego.usuario.id,
@@ -125,7 +124,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             data,
           });
         }
-        console.log("juego", juego);
         return juego;
       });
       res.json(juego);
@@ -139,7 +137,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         req.body
       );
       const fechaToDate = new Date(fecha as string);
-      console.log(fechaToDate, fecha)
       const juego = await prisma.$transaction(async (tx) => {
         const juego = await tx.juego.update({
           where: {

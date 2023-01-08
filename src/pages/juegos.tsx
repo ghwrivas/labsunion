@@ -3,6 +3,14 @@ import { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import {
+  Card,
+  Col,
+  Container,
+  Form,
+  ListGroup,
+  Row,
+} from "react-bootstrap";
 import { deleteJuego, useJuegos } from "../api-juegos";
 import Layout from "../components/Layout";
 import { sessionOptions } from "../lib/session";
@@ -10,7 +18,7 @@ import styles from "../styles/Juegos.module.css";
 import { Arbitro, Juego } from "../types";
 import { User } from "./api/user";
 
-export const JuegoList: React.FC = () => {
+export const JuegoList: React.FC<{ user: User }> = ({ user }) => {
   const router = useRouter();
   let {
     query: { fecha: fechaToFilter },
@@ -23,114 +31,134 @@ export const JuegoList: React.FC = () => {
   if (juegos == null) return <div>Cargando...</div>;
 
   return (
-    <div className={styles.container}>
-      <form
+    <div>
+      <Form
         onSubmit={async (e) => {
           e.preventDefault();
           setFecha("");
         }}
       >
-        <input
-          type="date"
-          placeholder="Fecha"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-        />
-      </form>
-      {juegos.length ? (
-        <Link
-          href={{
-            pathname: "/juegos/create",
-            query: { fecha },
-          }}
-        >
-          <a>Agregar Juego</a>
-        </Link>
+        <Form.Group className="mb-3" controlId="formBasicFecha">
+          <Form.Label>Fecha</Form.Label>
+          <Form.Control
+            type="date"
+            placeholder="Fecha"
+            name="fecha"
+            value={fecha}
+            required
+            onChange={(e) => setFecha(e.target.value)}
+          />
+        </Form.Group>
+      </Form>
+      {user.role === "COORDINADOR" ? (
+        <div className={styles.addButton}>
+          <Link
+            href={{
+              pathname: "/juegos/create",
+              query: { fecha },
+            }}
+          >
+            <a title="Agregar juego">+</a>
+          </Link>
+        </div>
       ) : null}
 
-      <div className={styles.juegosGrid + " " + styles.gridHeader}>
-        <label>Estadio</label>
-        <label>Hora</label>
-        <label>Categoría</label>
-        <label>Árbitros</label>
-        <label>Estatus</label>
-      </div>
+      {!juegos.length ? (
+        <Form.Text className="text-muted">
+          No se encontraron juegos registrados para la fecha seleccionada.
+        </Form.Text>
+      ) : null}
       {juegos.map((juego) => (
-        <JuegoItem juego={juego} key={juego.id} />
+        <JuegoItem juego={juego} user={user} key={juego.id} />
       ))}
     </div>
   );
 };
 
 const ArbitrosList: React.FC<{ arbitros: Arbitro[] }> = ({ arbitros }) => (
-  <ul>
+  <ListGroup>
     {arbitros.map((arbitro) => (
-      <li key={arbitro.id}>
+      <ListGroup.Item key={arbitro.id}>
         {arbitro.nombre} {arbitro.apellido}
-      </li>
+      </ListGroup.Item>
     ))}
-  </ul>
+  </ListGroup>
 );
 
-const JuegoItem: React.FC<{ juego: Juego }> = ({ juego }) => (
-  <div className={styles.juegosGrid}>
-    <div className={styles.gridCell} data-name="Estadio: ">
-      {juego.estadio.nombre}
-    </div>
-    <div className={styles.gridCell} data-name="Hora: ">
-      {getHoraJuego(juego.hora)}
-    </div>
-    <div className={styles.gridCell} data-name="Categoría: ">
-      {juego.categoriaJuego.nombre}
-    </div>
-    <div className={styles.gridCell} data-name="Árbitros: ">
-      {juego.arbitros.length ? (
-        <ArbitrosList arbitros={juego.arbitros} />
-      ) : (
-        "Sin árbitros asignados"
-      )}
-    </div>
-    <div className={styles.gridCell} data-name="Estatus: ">
-      {juego.estatus}
-    </div>
-    <div className={styles.gridCell}>
-      <div className={styles.actions}>
-        {juego.estatus == "PROGRAMADO" || juego.estatus == "SUSPENDIDO" ? (
-          <Link
-            href={{
-              pathname: "/juegos/edit",
-              query: { juegoId: juego.id },
-            }}
-          >
-            <a>Editar</a>
-          </Link>
-        ) : (
-          ""
-        )}
-        &nbsp;
-        {juego.estatus == "PROGRAMADO" ? (
-          <Link href="">
-            <a onClick={(e) => handleDelete(juego)}>Eliminar</a>
-          </Link>
-        ) : (
-          ""
-        )}
-        &nbsp;
-        {juego.estatus == "PROGRAMADO" || juego.estatus == "SUSPENDIDO" ? (
-          <Link
-            href={{
-              pathname: "/juegos/status",
-              query: { juegoId: juego.id },
-            }}
-          >
-            <a>Estatus</a>
-          </Link>
-        ) : (
-          ""
-        )}
-      </div>
-    </div>
-  </div>
+const JuegoItem: React.FC<{ juego: Juego; user: User }> = ({ juego, user }) => (
+  <Card>
+    <Card.Body>
+      <Container>
+        <Row>
+          <Col>
+            <Card.Subtitle>Estadio</Card.Subtitle>
+            <Card.Text>{juego.estadio.nombre}</Card.Text>
+          </Col>
+          <Col>
+            <Card.Subtitle>Categoría</Card.Subtitle>
+            <Card.Text>{juego.categoriaJuego.nombre}</Card.Text>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Card.Subtitle>Estatus</Card.Subtitle>
+            <Card.Text>{juego.estatus}</Card.Text>
+          </Col>
+          <Col>
+            <Card.Subtitle>Hora</Card.Subtitle>
+            <Card.Text>{getHoraJuego(juego.hora)}</Card.Text>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Card.Subtitle>Árbitros</Card.Subtitle>
+            {juego.arbitros.length ? (
+              <ArbitrosList arbitros={juego.arbitros} />
+            ) : (
+              "Sin árbitros asignados"
+            )}
+          </Col>
+        </Row>
+      </Container>
+      {user.role === "COORDINADOR" ? (
+        <div className={styles.actions}>
+          {juego.estatus == "PROGRAMADO" || juego.estatus == "SUSPENDIDO" ? (
+            <Link
+              href={{
+                pathname: "/juegos/edit",
+                query: { juegoId: juego.id },
+              }}
+            >
+              <a>Editar</a>
+            </Link>
+          ) : (
+            ""
+          )}
+          &nbsp;
+          {juego.estatus == "PROGRAMADO" ? (
+            <Link href="">
+              <a onClick={(e) => handleDelete(juego)}>Eliminar</a>
+            </Link>
+          ) : (
+            ""
+          )}
+          &nbsp;
+          {juego.estatus == "PROGRAMADO" || juego.estatus == "SUSPENDIDO" ? (
+            <Link
+              href={{
+                pathname: "/juegos/status",
+                query: { juegoId: juego.id },
+              }}
+            >
+              <a>Estatus</a>
+            </Link>
+          ) : (
+            ""
+          )}
+        </div>
+      ) : null}
+    </Card.Body>
+  </Card>
 );
 
 async function handleDelete(juego: Juego) {
@@ -155,7 +183,7 @@ const Juegos = ({
   return (
     <Layout>
       <main>
-        <JuegoList />
+        <JuegoList user={user} />
       </main>
     </Layout>
   );
