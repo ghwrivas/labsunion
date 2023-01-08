@@ -38,7 +38,6 @@ export const JuegoCreateForm: React.FC = () => {
 
   useEffect(() => {
     setDatos(datos);
-    console.log(datos.arbitros)
   }, [datos]);
 
   const { data: arbitros, error: errorArbitros } = useArbitros();

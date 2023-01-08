@@ -6,27 +6,13 @@
   margin-right: 0.5rem;
 }
 
-.arbitrosList {
-  flex-direction: column;
-}
-
-.arbitroItem {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.5rem;
-}
-
-.info {
-  width: 20rem;
-}
-
 .addButton {
   position: fixed;
   z-index: 1000;
-  right: 0;
-  height: 60px;
-  width: 60px;
-  line-height: 55px;
+  right: 0.4rem;
+  height: 3rem;
+  width: 3rem;
+  line-height: 2.6rem;
   font-size: 2em;
   font-weight: bold;
   border-radius: 50%;
