@@ -22,11 +22,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           categoriaJuego: {},
         },
       });
+      const fechaIsoString = juego.fecha.toISOString().substring(0, 11);
+      const horaToIsoString = juego.hora.toISOString().substring(11);
+      const fechaUTC = new Date(fechaIsoString+horaToIsoString);
+      const horaLocale = fechaUTC.toLocaleString().substring(11)
 
       let juegoCleaned: any = {
         id: juego.id,
         hora: juego.hora,
-        fecha: juego.fecha,
+        fecha: fechaIsoString+horaLocale+'.000Z',
         precio: Number(juego.precio),
         estatus: juego.estatus,
         estadio: { ...juego.estadio },
@@ -120,7 +124,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             data,
           });
         }
-        console.log("juego", juego);
         return juego;
       });
       res.json(juego);

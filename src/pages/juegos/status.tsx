@@ -5,9 +5,18 @@ import { sessionOptions } from "../../lib/session";
 import { EstatusJuego, JuegoEditData } from "../../types";
 import { User } from "../api/user";
 import Layout from "../../components/Layout";
-import styles from "../../styles/Juegos.module.css";
 import { changeStatus, findJuego } from "../../api-juegos";
 import Link from "next/link";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  ListGroup,
+  Row,
+  Spinner,
+} from "react-bootstrap";
 
 export const ChangeStatusForm: React.FC = () => {
   const router = useRouter();
@@ -49,12 +58,13 @@ export const ChangeStatusForm: React.FC = () => {
   useEffect(() => {
     getJuego();
   }, []);
+  useEffect(() => {
+    setDatos(datos);
+  }, [datos]);
 
   if (errorLoadingJuego) return <div>Error cargando juego...</div>;
 
   if (loadingJuego == true) return <div>Cargando...</div>;
-
-  console.log("datos", JSON.stringify(datos));
 
   const handleSelectChange = (event) => {
     const index = event.target.selectedIndex;
@@ -80,54 +90,71 @@ export const ChangeStatusForm: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Actualizar estatus</h2>
+    <Form onSubmit={handleSubmit}>
       <Link
         href={{
           pathname: "/juegos",
           query: { fecha: datos.fecha.substring(0, 10) },
         }}
       >
-        <a>Volver</a>
+        <a style={{ float: "right" }}>Volver</a>
       </Link>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="fecha">Fecha y hora</label>
-        <span className={styles.info}>{datos.fecha}</span>
-        <br></br>
-        <label htmlFor="estadio">Estadio</label>
-        <span>{datos.estadio}</span>
-        <br></br>
-        <label htmlFor="categoria">Categoría</label>
-        <span>{datos.categoria}</span>
-        <br></br>
-        <label htmlFor="arbitro">Árbitros</label>
-        {datos.arbitros.length ? (
-          <div>
-            {datos.arbitros.map((arbitro) => (
-              <div className={styles.arbitroItem} key={arbitro.id}>
-                <span>
-                  {arbitro.nombre} {arbitro.apellido}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          "Sin árbitros asignados"
-        )}
-        <br></br>
-        <label htmlFor="estatus-actual">Estatus Actual</label>
-        <span>{currentStatus}</span>
-        <br></br>
-        <label htmlFor="estatus">Nuevo estatus</label>
-        <select
-          id="estatus"
+      <h4>Actualizar estatus</h4>
+      <Card>
+        <Card.Header>Datos del juego</Card.Header>
+        <Card.Body>
+          <Container>
+            <Row>
+              <Col>
+                <Card.Subtitle>Fecha</Card.Subtitle>
+                <Card.Text>{datos.fecha}</Card.Text>
+              </Col>
+              <Col>
+                <Card.Subtitle>Estadio</Card.Subtitle>
+                <Card.Text>{datos.estadio}</Card.Text>
+              </Col>
+            </Row>
+            <br></br>
+            <Row>
+              <Col>
+                <Card.Subtitle>Categoría</Card.Subtitle>
+                <Card.Text>{datos.categoria}</Card.Text>
+              </Col>
+              <Col>
+                <Card.Subtitle>Estatus actual</Card.Subtitle>
+                <Card.Text>{currentStatus}</Card.Text>
+              </Col>
+            </Row>
+            <br></br>
+            <Row>
+              <Col>
+                <Card.Subtitle>Árbitros</Card.Subtitle>
+                {datos.arbitros.length ? (
+                  <ListGroup>
+                    {datos.arbitros.map((arbitro) => (
+                      <ListGroup.Item key={arbitro.id}>
+                        {arbitro.nombre} {arbitro.apellido}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  "Sin árbitros asignados"
+                )}
+              </Col>
+            </Row>
+          </Container>
+        </Card.Body>
+      </Card>
+      <br></br>
+      <Form.Group className="mb-3" controlId="formBasicEstatus">
+        <Form.Label>Nuevo estatus</Form.Label>
+        <Form.Select
           name="estatus"
           required
-          placeholder="Seleccione el estatus"
           onChange={handleSelectChange}
           value={datos.estatus}
         >
-          <option value={""} key="">
+          <option id={null} value="" key="">
             Seleccione
           </option>
           {Object.keys(EstatusJuego)
@@ -137,28 +164,47 @@ export const ChangeStatusForm: React.FC = () => {
                 {estatus}
               </option>
             ))}
-        </select>
-        <button className={styles.addButton} disabled={loading}>
-          Guardar
-        </button>
-      </form>
-    </div>
+        </Form.Select>
+      </Form.Group>
+      <br></br>
+      <div className="mx-auto .mt-1" style={{ width: "200px" }}>
+        <Button
+          style={{ width: "200px" }}
+          variant="primary"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? (
+            <div>
+              <Spinner
+                as="span"
+                animation="grow"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              ></Spinner>
+              Enviando...
+            </div>
+          ) : (
+            "Guardar"
+          )}
+        </Button>
+      </div>
+    </Form>
   );
 };
 
-const Juegos = () => {
+const ChangeStatus = () => {
   return (
     <Layout>
-      <div className="container-form">
-        <main>
-          <ChangeStatusForm key="form" />
-        </main>
-      </div>
+      <main>
+        <ChangeStatusForm key="form" />
+      </main>
     </Layout>
   );
 };
 
-export default Juegos;
+export default ChangeStatus;
 
 export const getServerSideProps = withIronSessionSsr(async function ({
   req,
