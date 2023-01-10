@@ -1,4 +1,8 @@
-import { EstatusJuego } from "@prisma/client";
+import {
+  EstatusJuego,
+  TipoCuentaCobrar,
+  EstatusCuentaCobrar,
+} from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../lib/db";
@@ -24,13 +28,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       });
       const fechaIsoString = juego.fecha.toISOString().substring(0, 11);
       const horaToIsoString = juego.hora.toISOString().substring(11);
-      const fechaUTC = new Date(fechaIsoString+horaToIsoString);
-      const horaLocale = fechaUTC.toLocaleString().substring(11)
+      const fechaUTC = new Date(fechaIsoString + horaToIsoString);
+      const horaLocale = fechaUTC.toLocaleString().substring(11);
 
       let juegoCleaned: any = {
         id: juego.id,
         hora: juego.hora,
-        fecha: fechaIsoString+horaLocale+'.000Z',
+        fecha: fechaIsoString + horaLocale + ".000Z",
         precio: Number(juego.precio),
         estatus: juego.estatus,
         estadio: { ...juego.estadio },
@@ -201,12 +205,56 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           where: {
             id,
           },
+          include: {
+            usuarioJuegos: {
+              include: {
+                usuario: {},
+              },
+            },
+          },
         });
         if (
           juego.estatus === EstatusJuego.PROGRAMADO ||
           juego.estatus === EstatusJuego.SUSPENDIDO
         ) {
           await tx.juego.update({ where: { id }, data: { estatus } });
+          if (
+            estatus === EstatusJuego.REALIZADO ||
+            estatus === EstatusJuego.REALIZADO_SIN_PAGO
+          ) {
+            // Crear cuenta por cobrar por arbitro
+            const periodo = await tx.periodo.findFirst({
+              where: {
+                activo: true,
+              },
+            });
+            for (let i = 0; i < juego.usuarioJuegos.length; i++) {
+              const cuentaCobrar = await tx.cuentaCobrar.create({
+                data: {
+                  monto: Number(juego.precio) * 0.1,
+                  descripcion: "Finanza por juego arbitrado",
+                  usuario: {
+                    connect: { id: juego.usuarioJuegos[i].usuarioId },
+                  },
+                  tipo: TipoCuentaCobrar.FINANZA_POR_JUEGO,
+                  periodo: {
+                    connect: { id: periodo.id },
+                  },
+                  estatus: EstatusCuentaCobrar.PENDIENTE,
+                },
+              });
+              await tx.cuentaCobrarJuego.create({
+                data: {
+                  cuentaCobrar: {
+                    connect: { id: cuentaCobrar.id },
+                  },
+                  juego: {
+                    connect: { id: juego.id },
+                  },
+                },
+              });
+            }
+          }
         }
       });
       res.json({ status: "ok" });
