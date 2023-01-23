@@ -12,6 +12,18 @@ export enum EstatusJuego {
   REALIZADO_SIN_PAGO = "REALIZADO_SIN_PAGO",
 }
 
+export enum TipoCuentaCobrar {
+  FINANZA_POR_JUEGO = "Finanza",
+  VENTA_DE_ARTICULO = "VENTA_DE_ARTICULO",
+  DEUDA_PERIODO_ANTERIOR = "DEUDA_PERIODO_ANTERIOR",
+  OTRO = "OTRO",
+}
+
+export enum EstatusCuentaCobrar {
+  PENDIENTE = "Pendiente",
+  PAGADO = "Pagado",
+}
+
 export interface Arbitro {
   id: number;
   nombre: string;
@@ -58,4 +70,27 @@ export interface JuegoEditData {
   categoria: string;
   precio: number;
   arbitros: Arbitro[];
+}
+
+export interface JuegoCuentaCobrar {
+  id: string;
+  estatus: EstatusJuego;
+  fecha: string;
+  estadio: string;
+  categoria: string;
+}
+
+export interface CuentaCobrar {
+  id: number;
+  monto: number;
+  descripcion: string;
+  tipo: TipoCuentaCobrar;
+  estatus: EstatusCuentaCobrar;
+  juego?: JuegoCuentaCobrar;
+}
+
+export interface AbonoCreateData {
+  cuentaCobrarId: number;
+  tipo: TipoCuentaCobrar;
+  monto: number;
 }

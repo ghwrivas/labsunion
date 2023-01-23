@@ -107,7 +107,6 @@ export const JuegoCreateForm: React.FC = () => {
       return arbitro.id !== id;
     });
     datos.arbitros = arbitros;
-    console.log('AAA', datos.arbitros)
     setDatos({
       ...datos,
     });

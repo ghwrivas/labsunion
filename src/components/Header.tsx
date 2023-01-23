@@ -27,6 +27,11 @@ export default function Header() {
                   Crear juego
                 </NavDropdown.Item>
               </NavDropdown>
+              <NavDropdown title="Finanza" id="basic-nav-dropdown">
+                <NavDropdown.Item href="/cuentas-cobrar">
+                  Registrar pago
+                </NavDropdown.Item>
+              </NavDropdown>
             </Nav>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
