@@ -13,7 +13,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { createAbonos } from "../api-abonos";
-import { useArbitros } from "../api-arbitros";
+import { useArbitrosByActivo } from "../api-arbitros";
 import { useCuentasCobrar } from "../api-cuentas-cobrar";
 import Layout from "../components/Layout";
 import { sessionOptions } from "../lib/session";
@@ -33,7 +33,7 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
   const [abonoCreateData, setAbonoCreateData] = useState(
     [] as AbonoCreateData[]
   );
-  const { data: arbitros, error: errorArbitros } = useArbitros();
+  const { data: arbitros, error: errorArbitros } = useArbitrosByActivo();
   const { data: cuentasCobrar, error } = useCuentasCobrar(arbitroId);
 
   useEffect(() => {

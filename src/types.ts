@@ -5,6 +5,15 @@ export interface Todo {
   completed: boolean;
 }
 
+export enum Role {
+  ARBITRO = "ARBITRO",
+  COORDINADOR = "COORDINADOR",
+  PRESIDENTE = "PRESIDENTE",
+  TESORERO = "TESORERO",
+  SECRETARIO = "SECRETARIO",
+  ADMIN = "ADMIN",
+}
+
 export enum EstatusJuego {
   PROGRAMADO = "PROGRAMADO",
   REALIZADO = "REALIZADO",
@@ -28,6 +37,20 @@ export interface Arbitro {
   id: number;
   nombre: string;
   apellido: string;
+  fecha_nacimiento: Date;
+  correo_electronico: string;
+  role: Role;
+  activo: boolean;
+}
+
+export interface ArbitroEditData {
+  id: string;
+  nombre: string;
+  apellido: string;
+  fecha_nacimiento: string;
+  correo_electronico: string;
+  role: string;
+  activo: "true" | "false";
 }
 
 export interface Estadio {

@@ -1,7 +1,7 @@
 import { withIronSessionSsr } from "iron-session/next";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { useArbitros } from "../../api-arbitros";
+import { useArbitrosByActivo } from "../../api-arbitros";
 import { useCategorias } from "../../api-categorias";
 import { sessionOptions } from "../../lib/session";
 import { JuegoEditData } from "../../types";
@@ -52,7 +52,7 @@ export const JuegoEditForm: React.FC = () => {
     setDatos(datos);
   }, [datos]);
 
-  const { data: arbitros, error: errorArbitros } = useArbitros();
+  const { data: arbitros, error: errorArbitros } = useArbitrosByActivo();
   const { data: categorias, error: errorCategorias } = useCategorias();
   const { data: estadios, error: errorEstadios } = useEstadios();
 

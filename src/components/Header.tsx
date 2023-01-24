@@ -32,6 +32,9 @@ export default function Header() {
                   Registrar pago
                 </NavDropdown.Item>
               </NavDropdown>
+              <NavDropdown title="Admin" id="basic-nav-dropdown">
+                <NavDropdown.Item href="/arbitros">Árbitros</NavDropdown.Item>
+              </NavDropdown>
             </Nav>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
