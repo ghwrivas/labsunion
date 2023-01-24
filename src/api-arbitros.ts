@@ -17,3 +17,13 @@ export const editArbitro = async (data: ArbitroEditData) => {
     throw new Error("error al editar arbitro");
   }
 };
+
+export const createArbitro = async (data: ArbitroEditData) => {
+  const response = await fetch(arbitrosPath, {
+    method: "POST",
+    body: JSON.stringify({ ...data }),
+  });
+  if (response.status === 500) {
+    throw new Error("error al crear arbitro");
+  }
+};

@@ -1,5 +1,6 @@
 import { Role, Usuario } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { hashPass } from "../../lib/crypto-pass";
 import { prisma } from "../../lib/db";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -58,6 +59,34 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           role,
           activo: activo === "true",
           fecha_nacimiento: fechaToDate,
+        },
+      });
+      res.json({ status: "ok" });
+    } catch (error) {
+      res.status(500).json({ status: "error" });
+    }
+  } else if (req.method === "POST") {
+    try {
+      const {
+        nombre,
+        apellido,
+        fecha_nacimiento,
+        correo_electronico,
+        role: rol,
+        activo,
+      } = JSON.parse(req.body);
+      const fechaToDate = new Date(fecha_nacimiento as string);
+      const role: Role = Role[rol];
+      const contrasenia = await hashPass(fecha_nacimiento.substring(0, 4));
+      await prisma.usuario.create({
+        data: {
+          nombre,
+          apellido,
+          correo_electronico,
+          role,
+          activo: activo === "true",
+          fecha_nacimiento: fechaToDate,
+          contrasenia,
         },
       });
       res.json({ status: "ok" });

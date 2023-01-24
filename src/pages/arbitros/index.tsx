@@ -3,7 +3,7 @@ import { InferGetServerSidePropsType } from "next";
 import { sessionOptions } from "../../lib/session";
 import { User } from "../api/user";
 import Layout from "../../components/Layout";
-import { editArbitro, useArbitros } from "../../api-arbitros";
+import { createArbitro, editArbitro, useArbitros } from "../../api-arbitros";
 import { Arbitro, ArbitroEditData, Role } from "../../types";
 import {
   Button,
@@ -35,15 +35,17 @@ export const ArbitrosList: React.FC<{ user: User }> = ({ user }) => {
   };
 
   const handleShow = (arbitro: Arbitro) => {
-    setDatos({
-      id: String(arbitro.id),
-      nombre: arbitro.nombre,
-      apellido: arbitro.apellido,
-      fecha_nacimiento: arbitro.fecha_nacimiento.toString().substring(0, 10),
-      correo_electronico: arbitro.correo_electronico,
-      role: arbitro.role,
-      activo: arbitro.activo ? "true" : "false",
-    });
+    if (arbitro !== null) {
+      setDatos({
+        id: String(arbitro.id),
+        nombre: arbitro.nombre,
+        apellido: arbitro.apellido,
+        fecha_nacimiento: arbitro.fecha_nacimiento.toString().substring(0, 10),
+        correo_electronico: arbitro.correo_electronico,
+        role: arbitro.role,
+        activo: arbitro.activo ? "true" : "false",
+      });
+    }
     setShowEditForm(true);
   };
 
@@ -101,7 +103,11 @@ export const ArbitrosList: React.FC<{ user: User }> = ({ user }) => {
     event.preventDefault();
     setLoading(true);
     try {
-      await editArbitro(datos);
+      if (datos.id === "") {
+        await createArbitro(datos);
+      } else {
+        await editArbitro(datos);
+      }
       alert("Datos guardados!!!");
       event.target.reset();
     } catch (error) {
@@ -112,7 +118,18 @@ export const ArbitrosList: React.FC<{ user: User }> = ({ user }) => {
 
   return (
     <>
-      <h4>Árbitros</h4>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h4>Árbitros</h4>
+        {user.role === "ADMIN" ? (
+          <Button
+            variant="link"
+            style={{ float: "right" }}
+            onClick={() => handleShow(null)}
+          >
+            Nuevo
+          </Button>
+        ) : null}
+      </div>
       {arbitros.map((arbitro) => (
         <Card style={{ margin: "0.2rem" }} key={arbitro.id}>
           <Card.Body>
@@ -161,7 +178,7 @@ export const ArbitrosList: React.FC<{ user: User }> = ({ user }) => {
       <Modal show={showEditForm} onHide={handleClose}>
         <Form onSubmit={handleSubmit}>
           <Modal.Header closeButton>
-            <Modal.Title>Editar árbitro</Modal.Title>
+            <Modal.Title>{datos.id ? "Editar" : "Nuevo"} árbitro</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form.Group className="mb-3" controlId="editForm.nombre">
