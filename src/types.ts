@@ -59,6 +59,13 @@ export interface EstadioData {
   activo: "true" | "false";
 }
 
+export interface CategoriaData {
+  id: string;
+  nombre: string;
+  precio: string;
+  activo: "true" | "false";
+}
+
 export interface Estadio {
   id: number;
   nombre: string;

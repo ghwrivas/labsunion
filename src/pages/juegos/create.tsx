@@ -2,7 +2,7 @@ import { withIronSessionSsr } from "iron-session/next";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useArbitrosByActivo } from "../../api-arbitros";
-import { useCategorias } from "../../api-categorias";
+import { useCategoriasByActivo } from "../../api-categorias";
 import { sessionOptions } from "../../lib/session";
 import { JuegoCreateData } from "../../types";
 import { User } from "../api/user";
@@ -37,7 +37,7 @@ export const JuegoCreateForm: React.FC = () => {
   }, [datos]);
 
   const { data: arbitros, error: errorArbitros } = useArbitrosByActivo();
-  const { data: categorias, error: errorCategorias } = useCategorias();
+  const { data: categorias, error: errorCategorias } = useCategoriasByActivo();
   const { data: estadios, error: errorEstadios } = useEstadiosByActivo();
 
   if (errorArbitros != null) return <div>Error cargando árbitros...</div>;
