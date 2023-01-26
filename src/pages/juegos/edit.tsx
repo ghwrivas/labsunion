@@ -7,7 +7,7 @@ import { sessionOptions } from "../../lib/session";
 import { JuegoEditData } from "../../types";
 import { User } from "../api/user";
 import Layout from "../../components/Layout";
-import { useEstadios } from "../../api-estadios";
+import { useEstadiosByActivo } from "../../api-estadios";
 import { editJuego, findJuego } from "../../api-juegos";
 import Link from "next/link";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
@@ -54,7 +54,7 @@ export const JuegoEditForm: React.FC = () => {
 
   const { data: arbitros, error: errorArbitros } = useArbitrosByActivo();
   const { data: categorias, error: errorCategorias } = useCategorias();
-  const { data: estadios, error: errorEstadios } = useEstadios();
+  const { data: estadios, error: errorEstadios } = useEstadiosByActivo();
 
   if (errorLoadingJuego) return <div>Error cargando juego...</div>;
   if (errorArbitros != null) return <div>Error cargando árbitros...</div>;

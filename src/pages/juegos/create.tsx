@@ -7,14 +7,10 @@ import { sessionOptions } from "../../lib/session";
 import { JuegoCreateData } from "../../types";
 import { User } from "../api/user";
 import Layout from "../../components/Layout";
-import { useEstadios } from "../../api-estadios";
+import { useEstadiosByActivo } from "../../api-estadios";
 import { createJuego } from "../../api-juegos";
 import Form from "react-bootstrap/Form";
-import {
-  Button,
-  ListGroup,
-  Spinner,
-} from "react-bootstrap";
+import { Button, ListGroup, Spinner } from "react-bootstrap";
 
 export const JuegoCreateForm: React.FC = () => {
   const router = useRouter();
@@ -42,7 +38,7 @@ export const JuegoCreateForm: React.FC = () => {
 
   const { data: arbitros, error: errorArbitros } = useArbitrosByActivo();
   const { data: categorias, error: errorCategorias } = useCategorias();
-  const { data: estadios, error: errorEstadios } = useEstadios();
+  const { data: estadios, error: errorEstadios } = useEstadiosByActivo();
 
   if (errorArbitros != null) return <div>Error cargando árbitros...</div>;
   if (errorCategorias != null) return <div>Error cargando categorías...</div>;

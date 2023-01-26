@@ -53,6 +53,12 @@ export interface ArbitroEditData {
   activo: "true" | "false";
 }
 
+export interface EstadioData {
+  id: string;
+  nombre: string;
+  activo: "true" | "false";
+}
+
 export interface Estadio {
   id: number;
   nombre: string;

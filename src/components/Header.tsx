@@ -34,6 +34,7 @@ export default function Header() {
               </NavDropdown>
               <NavDropdown title="Admin" id="basic-nav-dropdown">
                 <NavDropdown.Item href="/arbitros">Árbitros</NavDropdown.Item>
+                <NavDropdown.Item href="/estadios">Estadios</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>
