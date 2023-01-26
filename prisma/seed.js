@@ -1,7 +1,32 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, TipoMovimiento } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.periodo.upsert({
+    where: { id: 1 },
+    update: {
+      activo: true,
+    },
+    create: {
+      anio: new Date().getFullYear(),
+      activo: true,
+    },
+  });
+
+  await prisma.movimientoFinanza.upsert({
+    where: { id: 1 },
+    update: {
+      descripcion: TipoMovimiento.CAPITAL_INICIAL,
+    },
+    create: {
+      fecha: new Date(),
+      descripcion: TipoMovimiento.CAPITAL_INICIAL,
+      monto: 0.0,
+      saldo: 0.0,
+      tipo: TipoMovimiento.CAPITAL_INICIAL,
+    },
+  });
+
   await prisma.usuario.upsert({
     where: { correo_electronico: "miguel.barco@gmail.com" },
     update: {
@@ -14,6 +39,21 @@ async function main() {
       fecha_nacimiento: new Date(),
       correo_electronico: "miguel.barco@gmail.com",
       contrasenia: "miguelito",
+    },
+  });
+
+  await prisma.usuario.upsert({
+    where: { correo_electronico: "williams.rivas1@gmail.com" },
+    update: {
+      contrasenia:
+        "$2b$10$sw.jdBKHYaerHx4LHnAmtuYa/vv.wUqOY.lOEZ8jxJChcaSIf/3OS",
+    },
+    create: {
+      nombre: "Williams",
+      apellido: "Rivas",
+      fecha_nacimiento: new Date(),
+      correo_electronico: "williams.rivas1@gmail.com",
+      contrasenia: "elgato",
     },
   });
 
@@ -217,7 +257,6 @@ async function main() {
     },
   });
 
-
   await prisma.categoriaJuego.upsert({
     where: { nombre: "Juvenil AA" },
     update: {},
@@ -257,7 +296,6 @@ async function main() {
       activo: true,
     },
   });
-
 }
 main()
   .then(async () => {
