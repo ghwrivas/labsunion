@@ -49,6 +49,9 @@ export default function Header() {
             )}
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
+            {user?.isLoggedIn === true && <>Bienvenido {user.nombre}</>}
+          </Navbar.Collapse>
+          <Navbar.Collapse className="justify-content-end">
             {user?.isLoggedIn === true && (
               <Nav.Link
                 href="/api/logout"
@@ -62,7 +65,7 @@ export default function Header() {
                   router.push("/login");
                 }}
               >
-                Cerrar Sesión
+                Salir
               </Nav.Link>
             )}
           </Navbar.Collapse>
