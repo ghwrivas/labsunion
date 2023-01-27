@@ -5,6 +5,12 @@ export interface Todo {
   completed: boolean;
 }
 
+enum TipoMovimiento {
+  ABONO_CUENTA_COBRAR = "ABONO_CUENTA_COBRAR",
+  CAPITAL_INICIAL = "CAPITAL_INICIAL",
+  GASTO = "GASTO",
+}
+
 export enum Role {
   ARBITRO = "ARBITRO",
   COORDINADOR = "COORDINADOR",
@@ -76,6 +82,25 @@ export interface CategoriaJuego {
   id: number;
   nombre: string;
   precio: number;
+  activo: boolean;
+}
+
+export interface MovimientoGroup {
+  [key: string]: Movimiento[];
+}
+
+export interface MovimientoResult {
+  saldo: number;
+  movimientos: MovimientoGroup;
+}
+
+export interface Movimiento {
+  id: number;
+  fecha: string;
+  descripcion: string;
+  monto: number;
+  saldo: number;
+  tipo: TipoMovimiento;
   activo: boolean;
 }
 

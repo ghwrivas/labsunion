@@ -1,12 +1,26 @@
 import {
-  EstatusJuego,
-  TipoCuentaCobrar,
   EstatusCuentaCobrar,
   TipoMovimiento,
+  CuentaCobrar,
+  Usuario,
 } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../lib/db";
+
+function formatMovDescription(cuentaCobrar: CuentaCobrar, arbitro: Usuario) {
+  const nombreApellido = `${arbitro.nombre} ${arbitro.apellido}`;
+  switch (cuentaCobrar.tipo) {
+    case "FINANZA_POR_JUEGO":
+      return `${nombreApellido} paga finanza`;
+    case "DEUDA_PERIODO_ANTERIOR":
+      return `${nombreApellido} paga deuda periodo anterior`;
+    case "VENTA_DE_ARTICULO":
+      return `${nombreApellido} paga por venta de artículo`;
+    default:
+      return `${nombreApellido} paga deuda pendiente`;
+  }
+}
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -24,12 +38,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           },
         });
 
-        await tx.cuentaCobrar.update({
+        const cuentaCobrar = await tx.cuentaCobrar.update({
           where: {
             id: cuentaCobrarId,
           },
           data: {
             estatus: EstatusCuentaCobrar.PAGADO,
+          },
+        });
+
+        const arbitro = await tx.usuario.findFirst({
+          where: {
+            id: cuentaCobrar.usuarioId,
           },
         });
 
@@ -42,7 +62,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const movFinanza = await tx.movimientoFinanza.create({
           data: {
             fecha,
-            descripcion: tipo,
+            descripcion: formatMovDescription(cuentaCobrar, arbitro),
             monto: monto,
             saldo: newSaldoFinanza,
             tipo: TipoMovimiento.ABONO_CUENTA_COBRAR,

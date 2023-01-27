@@ -28,6 +28,9 @@ export default function Header() {
                 </NavDropdown.Item>
               </NavDropdown>
               <NavDropdown title="Finanza" id="basic-nav-dropdown">
+                <NavDropdown.Item href="/movimientos">
+                  Movimientos
+                </NavDropdown.Item>
                 <NavDropdown.Item href="/cuentas-cobrar">
                   Registrar pago
                 </NavDropdown.Item>
