@@ -123,6 +123,11 @@ export interface JuegoCreateData {
   arbitros: Arbitro[];
 }
 
+export interface GastoCreateData {
+  monto: number;
+  descripcion: string;
+}
+
 export interface JuegoEditData {
   id: string;
   fecha: string;
