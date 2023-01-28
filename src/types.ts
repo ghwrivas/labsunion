@@ -142,6 +142,7 @@ export interface JuegoCuentaCobrar {
   id: string;
   estatus: EstatusJuego;
   fecha: string;
+  hora: string;
   estadio: string;
   categoria: string;
 }

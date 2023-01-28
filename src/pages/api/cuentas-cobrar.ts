@@ -28,18 +28,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let cuentas: any = cuentasCobrar.map((cuentaCobrar) => {
       let juego = null;
       if (cuentaCobrar.cuentaCobrarJuegos.length) {
-        const fechaIsoString = cuentaCobrar.cuentaCobrarJuegos[0].juego.fecha
-          .toISOString()
-          .substring(0, 11);
-        const horaToIsoString = cuentaCobrar.cuentaCobrarJuegos[0].juego.hora
-          .toISOString()
-          .substring(11);
-        const fechaUTC = new Date(fechaIsoString + horaToIsoString);
-        const horaLocale = fechaUTC.toLocaleString().substring(11);
         juego = {
           id: cuentaCobrar.cuentaCobrarJuegos[0].id,
           estatus: cuentaCobrar.cuentaCobrarJuegos[0].juego.estatus,
-          fecha: fechaIsoString + horaLocale + ".000Z",
+          fecha: cuentaCobrar.cuentaCobrarJuegos[0].juego.fecha.toISOString(),
+          hora: cuentaCobrar.cuentaCobrarJuegos[0].juego.hora.toISOString(),
           estadio: cuentaCobrar.cuentaCobrarJuegos[0].juego.estadio.nombre,
           categoria:
             cuentaCobrar.cuentaCobrarJuegos[0].juego.categoriaJuego.nombre,

@@ -267,17 +267,13 @@ const CuentaCobrarItem: React.FC<{
                       <Col>
                         <Card.Subtitle>Fecha</Card.Subtitle>
                         <Card.Text>
-                          {new Date(cuentaCobrar.juego.fecha as string)
-                            .toISOString()
-                            .substring(0, 10)}
+                          {cuentaCobrar.juego.fecha.substring(0, 10)}
                         </Card.Text>
                       </Col>
                       <Col>
                         <Card.Subtitle>Hora</Card.Subtitle>
                         <Card.Text>
-                          {new Date(cuentaCobrar.juego.fecha as string)
-                            .toISOString()
-                            .substring(11, 16)}
+                        {cuentaCobrar.juego.hora.substring(11, 16)}
                         </Card.Text>
                       </Col>
                     </Row>
