@@ -26,15 +26,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           categoriaJuego: {},
         },
       });
-      const fechaIsoString = juego.fecha.toISOString().substring(0, 11);
-      const horaToIsoString = juego.hora.toISOString().substring(11);
-      const fechaUTC = new Date(fechaIsoString + horaToIsoString);
-      const horaLocale = fechaUTC.toLocaleString().substring(11);
 
       let juegoCleaned: any = {
         id: juego.id,
-        hora: juego.hora,
-        fecha: fechaIsoString + horaLocale + ".000Z",
+        fecha: juego.fecha,
         precio: Number(juego.precio),
         estatus: juego.estatus,
         estadio: { ...juego.estadio },
@@ -54,9 +49,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.json([]);
       return;
     }
+    const fechaAsStr = fecha as string;
     const juegos = await prisma.juego.findMany({
       where: {
-        fecha: new Date(fecha as string),
+        fecha: {
+          lte: new Date(`${fechaAsStr}T23:59:59.000Z`),
+          gte: new Date(`${fechaAsStr}T00:00:00.000Z`),
+        },
       },
       include: {
         usuarioJuegos: {
@@ -72,14 +71,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           estadioId: "asc",
         },
         {
-          hora: "asc",
+          fecha: "asc",
         },
       ],
     });
     const juegosCleaned = juegos.map((juego) => {
       let juegoCleaned: any = {
         id: juego.id,
-        hora: juego.hora,
         fecha: juego.fecha,
         precio: Number(juego.precio),
         estatus: juego.estatus,
@@ -116,7 +114,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             },
             precio,
             fecha: fechaToDate,
-            hora: fechaToDate,
           },
         });
 
@@ -157,7 +154,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             },
             precio,
             fecha: fechaToDate,
-            hora: fechaToDate,
           },
         });
 

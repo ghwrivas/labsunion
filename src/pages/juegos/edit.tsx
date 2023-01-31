@@ -12,6 +12,10 @@ import { editJuego, findJuego } from "../../api-juegos";
 import Link from "next/link";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
 
+function formatFecha (fecha: string) {
+  return `${fecha.substring(0, 10)}T${new Date(fecha).toLocaleTimeString()}`
+}
+
 export const JuegoEditForm: React.FC = () => {
   const router = useRouter();
   let {
@@ -32,9 +36,11 @@ export const JuegoEditForm: React.FC = () => {
   const getJuego = async () => {
     try {
       const juego = await findJuego(juegoId as string);
+      const fecha = formatFecha(juego.fecha);
+      console.log(fecha)
       setDatos({
         id: juegoId as string,
-        fecha: new Date(juego.fecha as string).toISOString().substring(0, 16),
+        fecha,
         categoria: String(juego.categoriaJuego.id),
         estadio: String(juego.estadio.id),
         precio: juego.precio,

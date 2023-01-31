@@ -40,9 +40,12 @@ export const ChangeStatusForm: React.FC = () => {
   const getJuego = async () => {
     try {
       const juego = await findJuego(juegoId as string);
+      const fechaUTC = new Date(juego.fecha as string);
       setDatos({
         id: juegoId as string,
-        fecha: new Date(juego.fecha as string).toISOString().substring(0, 16),
+        fecha: `${fechaUTC
+          .toISOString()
+          .substring(0, 10)}, ${fechaUTC.toLocaleTimeString()}`,
         categoria: String(juego.categoriaJuego.nombre),
         estadio: String(juego.estadio.nombre),
         estatus: juego.estatus,

@@ -3,14 +3,7 @@ import { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import {
-  Card,
-  Col,
-  Container,
-  Form,
-  ListGroup,
-  Row,
-} from "react-bootstrap";
+import { Card, Col, Container, Form, ListGroup, Row } from "react-bootstrap";
 import { deleteJuego, useJuegos } from "../api-juegos";
 import Layout from "../components/Layout";
 import { sessionOptions } from "../lib/session";
@@ -106,7 +99,7 @@ const JuegoItem: React.FC<{ juego: Juego; user: User }> = ({ juego, user }) => (
           </Col>
           <Col>
             <Card.Subtitle>Hora</Card.Subtitle>
-            <Card.Text>{getHoraJuego(juego.hora)}</Card.Text>
+            <Card.Text>{getHoraJuego(juego.fecha)}</Card.Text>
           </Col>
         </Row>
         <Row>
@@ -172,9 +165,9 @@ async function handleDelete(juego: Juego) {
   }
 }
 
-function getHoraJuego(hora) {
-  const date = new Date(hora);
-  return `${date.getHours()}:${date.getMinutes()}`;
+function getHoraJuego(fecha) {
+  const date = new Date(fecha);
+  return date.toLocaleTimeString().substring(0, 5);
 }
 
 const Juegos = ({

@@ -31,8 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         juego = {
           id: cuentaCobrar.cuentaCobrarJuegos[0].id,
           estatus: cuentaCobrar.cuentaCobrarJuegos[0].juego.estatus,
-          fecha: cuentaCobrar.cuentaCobrarJuegos[0].juego.fecha.toISOString(),
-          hora: cuentaCobrar.cuentaCobrarJuegos[0].juego.hora.toISOString(),
+          fecha: cuentaCobrar.cuentaCobrarJuegos[0].juego.fecha,
           estadio: cuentaCobrar.cuentaCobrarJuegos[0].juego.estadio.nombre,
           categoria:
             cuentaCobrar.cuentaCobrarJuegos[0].juego.categoriaJuego.nombre,

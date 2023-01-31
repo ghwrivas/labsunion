@@ -209,6 +209,16 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
   );
 };
 
+const getFormatedDate = (fecha: string) => {
+  const date = new Date(fecha as string);
+  return date.toLocaleDateString();
+};
+
+const getFormatedHour = (fecha: string) => {
+  const date = new Date(fecha as string);
+  return date.toLocaleTimeString();
+};
+
 const CuentaCobrarItem: React.FC<{
   cuentaCobrar: CuentaCobrar;
   user: User;
@@ -267,13 +277,15 @@ const CuentaCobrarItem: React.FC<{
                       <Col>
                         <Card.Subtitle>Fecha</Card.Subtitle>
                         <Card.Text>
-                          {cuentaCobrar.juego.fecha.substring(0, 10)}
+                          {getFormatedDate(cuentaCobrar.juego.fecha)}
                         </Card.Text>
                       </Col>
+                    </Row>
+                    <Row>
                       <Col>
                         <Card.Subtitle>Hora</Card.Subtitle>
                         <Card.Text>
-                        {cuentaCobrar.juego.hora.substring(11, 16)}
+                        {getFormatedHour(cuentaCobrar.juego.fecha)}
                         </Card.Text>
                       </Col>
                     </Row>

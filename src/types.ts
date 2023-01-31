@@ -106,7 +106,6 @@ export interface Movimiento {
 
 export interface Juego {
   id: number;
-  hora: string;
   fecha: string;
   precio: number;
   estatus: EstatusJuego;
@@ -142,7 +141,6 @@ export interface JuegoCuentaCobrar {
   id: string;
   estatus: EstatusJuego;
   fecha: string;
-  hora: string;
   estadio: string;
   categoria: string;
 }
