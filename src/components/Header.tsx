@@ -40,6 +40,9 @@ export default function Header() {
                     <NavDropdown.Item href="/cuentas-cobrar">
                       Registrar pago
                     </NavDropdown.Item>
+                    <NavDropdown.Item href="/cuentas-cobrar/create">
+                      Registrar cuenta por cobrar
+                    </NavDropdown.Item>
                     <NavDropdown.Item href="/gastos">
                       Registrar gasto
                     </NavDropdown.Item>
