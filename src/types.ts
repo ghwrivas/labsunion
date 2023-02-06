@@ -166,3 +166,9 @@ export interface CuentaCobrarCreateData {
   tipo: TipoCuentaCobrar;
   usuarioId: string;
 }
+
+export interface ChangePasswordData {
+  oldPassword: string;
+  newPassword: string;
+  verifyNewPassword: string;
+}

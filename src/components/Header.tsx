@@ -66,7 +66,15 @@ export default function Header() {
             )}
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
-            {user?.isLoggedIn === true && <>Bienvenido {user.nombre}</>}
+            {user?.isLoggedIn === true && (
+              <Nav>
+                <NavDropdown title={user.nombre} id="basic-nav-dropdown">
+                  <NavDropdown.Item href="/change-password">
+                    Cambiar contraseña
+                  </NavDropdown.Item>
+                </NavDropdown>
+              </Nav>
+            )}
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
             {user?.isLoggedIn === true && (
