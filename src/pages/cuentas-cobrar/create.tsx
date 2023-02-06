@@ -120,11 +120,13 @@ export const CuentasCobrarCreateForm: React.FC<{ user: User }> = ({ user }) => {
           <option id={null} value="" key="">
             Seleccione
           </option>
-          {Object.keys(TipoCuentaCobrar).map((tipo) => (
-            <option value={"" + tipo} key={tipo}>
-              {tipo}
-            </option>
-          ))}
+          {Object.keys(TipoCuentaCobrar)
+            .filter((tipo) => tipo !== "FINANZA_POR_JUEGO")
+            .map((tipo) => (
+              <option value={"" + tipo} key={tipo}>
+                {tipo}
+              </option>
+            ))}
         </Form.Select>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicDescripcion">
