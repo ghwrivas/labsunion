@@ -159,3 +159,10 @@ export interface AbonoCreateData {
   tipo: TipoCuentaCobrar;
   monto: number;
 }
+
+export interface CuentaCobrarCreateData {
+  monto: number;
+  descripcion: string;
+  tipo: TipoCuentaCobrar;
+  usuarioId: string;
+}
