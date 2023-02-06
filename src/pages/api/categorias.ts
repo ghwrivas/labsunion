@@ -1,8 +1,10 @@
-import { CategoriaJuego } from "@prisma/client";
+import { CategoriaJuego, Role } from "@prisma/client";
+import { withIronSessionApiRoute } from "iron-session/next";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/db";
+import { sessionOptions } from "../../lib/session";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+async function categoriasRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     const { activo } = req.query;
 
@@ -34,6 +36,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
     res.json(categoriasList);
   } else if (req.method === "PUT") {
+    if (!req.session.user || req.session.user.role === Role.ARBITRO) {
+      return res.status(403).json({ status: "forbidden" });
+    }
     try {
       const id = Number(req.query.categoriaId);
       const { nombre, activo, precio } = JSON.parse(req.body);
@@ -51,6 +56,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).json({ status: "error" });
     }
   } else if (req.method === "POST") {
+    if (!req.session.user || req.session.user.role === Role.ARBITRO) {
+      return res.status(403).json({ status: "forbidden" });
+    }
     try {
       const { nombre, activo, precio } = JSON.parse(req.body);
 
@@ -66,4 +74,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).json({ status: "error" });
     }
   }
-};
+}
+
+export default withIronSessionApiRoute(categoriasRoute, sessionOptions);

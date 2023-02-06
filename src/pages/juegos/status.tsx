@@ -7,6 +7,8 @@ import { User } from "../api/user";
 import Layout from "../../components/Layout";
 import { changeStatus, findJuego } from "../../api-juegos";
 import Link from "next/link";
+import { InferGetServerSidePropsType } from "next";
+
 import {
   Button,
   Card,
@@ -18,7 +20,10 @@ import {
   Spinner,
 } from "react-bootstrap";
 
-export const ChangeStatusForm: React.FC = () => {
+export const ChangeStatusForm: React.FC<{ user: User }> = ({ user }) => {
+  if (user.role !== "PRESIDENTE" && user.role !== "COORDINADOR") {
+    return <div>No tiene acceso a este modulo...</div>;
+  }
   const router = useRouter();
   let {
     query: { juegoId },
@@ -197,11 +202,13 @@ export const ChangeStatusForm: React.FC = () => {
   );
 };
 
-const ChangeStatus = () => {
+const ChangeStatus = ({
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <Layout>
       <main>
-        <ChangeStatusForm key="form" />
+        <ChangeStatusForm user={user} />
       </main>
     </Layout>
   );

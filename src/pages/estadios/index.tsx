@@ -77,16 +77,6 @@ export const EstadiosList: React.FC<{ user: User }> = ({ user }) => {
     }
   };
 
-  const handleSelectChange = (event) => {
-    const index = event.target.selectedIndex;
-    const el = event.target.childNodes[index];
-    const option = el.getAttribute("value") || "";
-    setDatos({
-      ...datos,
-      [event.target.name]: option,
-    });
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -108,7 +98,7 @@ export const EstadiosList: React.FC<{ user: User }> = ({ user }) => {
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>Estadios</h4>
-        {user.role === "ADMIN" ? (
+        {user.role !== "ARBITRO" ? (
           <Button
             variant="link"
             style={{ float: "right" }}
@@ -133,13 +123,15 @@ export const EstadiosList: React.FC<{ user: User }> = ({ user }) => {
                 </Col>
               </Row>
             </Container>
-            <Button
-              style={{ float: "right" }}
-              variant="link"
-              onClick={() => handleShow(estadio)}
-            >
-              Editar
-            </Button>
+            {user.role !== "ARBITRO" ? (
+              <Button
+                style={{ float: "right" }}
+                variant="link"
+                onClick={() => handleShow(estadio)}
+              >
+                Editar
+              </Button>
+            ) : null}
           </Card.Body>
         </Card>
       ))}

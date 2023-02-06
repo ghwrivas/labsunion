@@ -1,7 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/db";
+import { withIronSessionApiRoute } from "iron-session/next";
+import { sessionOptions } from "../../lib/session";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+async function cuentasCobrarRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     const { usuarioId } = req.query;
     const cuentasCobrar = await prisma.cuentaCobrar.findMany({
@@ -22,7 +24,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         abonoCuentasCobrar: {},
       },
       orderBy: {
-        id: "asc",
+        id: "desc",
       },
     });
     let cuentas: any = cuentasCobrar.map((cuentaCobrar) => {
@@ -48,4 +50,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
     res.json(cuentas);
   }
-};
+}
+
+export default withIronSessionApiRoute(cuentasCobrarRoute, sessionOptions);

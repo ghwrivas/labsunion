@@ -43,7 +43,7 @@ export const JuegoList: React.FC<{ user: User }> = ({ user }) => {
           />
         </Form.Group>
       </Form>
-      {user.role === "COORDINADOR" ? (
+      {user.role === "COORDINADOR" || user.role === "PRESIDENTE" ? (
         <div className={styles.addButton}>
           <Link
             href={{
@@ -113,7 +113,7 @@ const JuegoItem: React.FC<{ juego: Juego; user: User }> = ({ juego, user }) => (
           </Col>
         </Row>
       </Container>
-      {user.role === "COORDINADOR" ? (
+      {user.role === "COORDINADOR" || user.role === "PRESIDENTE" ? (
         <div className={styles.actions}>
           {juego.estatus == "PROGRAMADO" || juego.estatus == "SUSPENDIDO" ? (
             <Link

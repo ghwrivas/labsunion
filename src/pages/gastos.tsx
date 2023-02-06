@@ -1,6 +1,7 @@
 import { withIronSessionSsr } from "iron-session/next";
 import React, { useEffect } from "react";
 
+import { InferGetServerSidePropsType } from "next";
 import Form from "react-bootstrap/Form";
 import { Button, Spinner } from "react-bootstrap";
 import { GastoCreateData } from "../types";
@@ -9,7 +10,10 @@ import Layout from "../components/Layout";
 import { sessionOptions } from "../lib/session";
 import { User } from "./api/user";
 
-export const GastoCreateForm: React.FC = () => {
+export const GastoCreateForm: React.FC<{ user: User }> = ({ user }) => {
+  if (user.role !== "PRESIDENTE" && user.role !== "TESORERO") {
+    return <div>No tiene acceso a este modulo...</div>;
+  }
   const [loading, setLoading] = React.useState(false);
   const [datos, setDatos] = React.useState<GastoCreateData>({
     monto: 0,
@@ -109,11 +113,13 @@ export const GastoCreateForm: React.FC = () => {
   );
 };
 
-const Gastos = () => {
+const Gastos = ({
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <Layout>
       <main>
-        <GastoCreateForm key="form" />
+        <GastoCreateForm user={user} />
       </main>
     </Layout>
   );

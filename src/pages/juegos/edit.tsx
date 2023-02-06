@@ -11,12 +11,16 @@ import { useEstadiosByActivo } from "../../api-estadios";
 import { editJuego, findJuego } from "../../api-juegos";
 import Link from "next/link";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
+import { InferGetServerSidePropsType } from "next";
 
-function formatFecha (fecha: string) {
-  return `${fecha.substring(0, 10)}T${new Date(fecha).toLocaleTimeString()}`
+function formatFecha(fecha: string) {
+  return `${fecha.substring(0, 10)}T${new Date(fecha).toLocaleTimeString()}`;
 }
 
-export const JuegoEditForm: React.FC = () => {
+export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
+  if (user.role !== "PRESIDENTE" && user.role !== "COORDINADOR") {
+    return <div>No tiene acceso a este modulo...</div>;
+  }
   const router = useRouter();
   let {
     query: { juegoId },
@@ -37,7 +41,7 @@ export const JuegoEditForm: React.FC = () => {
     try {
       const juego = await findJuego(juegoId as string);
       const fecha = formatFecha(juego.fecha);
-      console.log(fecha)
+
       setDatos({
         id: juegoId as string,
         fecha,
@@ -63,7 +67,12 @@ export const JuegoEditForm: React.FC = () => {
   const { data: estadios, error: errorEstadios } = useEstadiosByActivo();
 
   if (errorLoadingJuego) return <div>Error cargando juego...</div>;
-  if (errorArbitros != null) return <div>Error cargando árbitros...</div>;
+  if (errorArbitros != null) {
+    if (errorArbitros.data && errorArbitros.data.status === "forbidden") {
+      return <div>No tiene acceso a este modulo...</div>;
+    }
+    return <div>Error cargando árbitros...</div>;
+  }
   if (errorCategorias != null) return <div>Error cargando categorías...</div>;
   if (errorEstadios != null) return <div>Error cargando estadios...</div>;
 
@@ -282,11 +291,13 @@ export const JuegoEditForm: React.FC = () => {
   );
 };
 
-const Juegos = () => {
+const Juegos = ({
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <Layout>
       <main>
-        <JuegoEditForm key="form" />
+        <JuegoEditForm user={user} />
       </main>
     </Layout>
   );

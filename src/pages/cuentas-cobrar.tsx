@@ -26,6 +26,9 @@ import {
 import { User } from "./api/user";
 
 export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
+  if (user.role !== "PRESIDENTE" && user.role !== "TESORERO") {
+    return <div>No tiene acceso a este modulo...</div>;
+  }
   const [arbitroId, setArbitroId] = useState("");
   const [loading, setLoading] = useState(false);
   const [montoTotalCuentasCobrar, setMontoTotalCuentasCobrar] = useState(0);
@@ -62,8 +65,18 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
     }
   }, [montoTotalCuentasCobrar, cuentasCobrar]);
 
-  if (errorArbitros != null) return <div>Error cargando árbitros...</div>;
-  if (error != null) return <div>Error cargando cuentas por cobrar...</div>;
+  if (errorArbitros != null) {
+    if (errorArbitros.data && errorArbitros.data.status === "forbidden") {
+      return <div>No tiene acceso a este modulo...</div>;
+    }
+    return <div>Error cargando árbitros...</div>;
+  }
+  if (error != null) {
+    if (error.data && error.data.status === "forbidden") {
+      return <div>No tiene acceso a este modulo...</div>;
+    }
+    return <div>Error cargando cuentas por cobrar...</div>;
+  }
   if (cuentasCobrar == null || arbitros == null) return <div>Cargando...</div>;
 
   const handleArbitroSelectChange = (event) => {
@@ -130,7 +143,7 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
             </option>
             {arbitros.map((arbitro) => (
               <option value={"" + arbitro.id} key={arbitro.id}>
-                {arbitro.nombre}
+                {`${arbitro.nombre} ${arbitro.apellido}`}
               </option>
             ))}
           </Form.Select>
@@ -184,7 +197,7 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
                 style={{ width: "200px" }}
                 variant="primary"
                 type="submit"
-                disabled={loading}
+                disabled={loading || montoTotalAbonar <= 0}
               >
                 {loading ? (
                   <div>
@@ -227,19 +240,21 @@ const CuentaCobrarItem: React.FC<{
   <Card>
     <Card.Body>
       <Container>
-        <Row>
-          <Col>
-            <Form.Check
-              id={String(cuentaCobrar.id)}
-              reverse
-              disabled={cuentaCobrar.estatus.toUpperCase() == "PAGADO"}
-              aria-label=""
-              onClick={(e) => {
-                handleMontoTotalAbonar(e, cuentaCobrar);
-              }}
-            />
-          </Col>
-        </Row>
+        {cuentaCobrar.estatus.toUpperCase() == "PENDIENTE" ? (
+          <Row>
+            <Col>
+              <Form.Check
+                id={String(cuentaCobrar.id)}
+                reverse
+                disabled={cuentaCobrar.estatus.toUpperCase() == "PAGADO"}
+                aria-label=""
+                onClick={(e) => {
+                  handleMontoTotalAbonar(e, cuentaCobrar);
+                }}
+              />
+            </Col>
+          </Row>
+        ) : null}
         <Row>
           <Col>
             <Card.Subtitle>Monto</Card.Subtitle>
@@ -285,7 +300,7 @@ const CuentaCobrarItem: React.FC<{
                       <Col>
                         <Card.Subtitle>Hora</Card.Subtitle>
                         <Card.Text>
-                        {getFormatedHour(cuentaCobrar.juego.fecha)}
+                          {getFormatedHour(cuentaCobrar.juego.fecha)}
                         </Card.Text>
                       </Col>
                     </Row>

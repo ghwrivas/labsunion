@@ -1,12 +1,13 @@
 import useSWR from "swr";
+import fetchJson from "./lib/fetchJson";
 import { Estadio, EstadioData } from "./types";
 
 const estadiosPath = "/api/estadios";
 
-export const useEstadios = () => useSWR<Estadio[]>(estadiosPath);
+export const useEstadios = () => useSWR<Estadio[]>(estadiosPath, fetchJson);
 
 export const useEstadiosByActivo = () =>
-  useSWR<Estadio[]>(`${estadiosPath}?activo=true`);
+  useSWR<Estadio[]>(`${estadiosPath}?activo=true`, fetchJson);
 
 export const editEstadio = async (data: EstadioData) => {
   const response = await fetch(`${estadiosPath}?estadioId=${data.id}`, {

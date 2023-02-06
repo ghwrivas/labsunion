@@ -23,21 +23,29 @@ export default function Header() {
                 <NavDropdown.Item href="/juegos">
                   Buscar juegos
                 </NavDropdown.Item>
-                <NavDropdown.Item href="/juegos/create">
-                  Crear juego
-                </NavDropdown.Item>
+                {user?.isLoggedIn &&
+                (user.role === "COORDINADOR" || user.role === "PRESIDENTE") ? (
+                  <NavDropdown.Item href="/juegos/create">
+                    Crear juego
+                  </NavDropdown.Item>
+                ) : null}
               </NavDropdown>
-              <NavDropdown title="Finanza" id="basic-nav-dropdown">
-                <NavDropdown.Item href="/movimientos">
-                  Movimientos
-                </NavDropdown.Item>
-                <NavDropdown.Item href="/cuentas-cobrar">
-                  Registrar pago
-                </NavDropdown.Item>
-                <NavDropdown.Item href="/gastos">
-                  Registrar gasto
-                </NavDropdown.Item>
-              </NavDropdown>
+              {user?.isLoggedIn &&
+              (user.role === "TESORERO" || user.role === "PRESIDENTE") ? (
+                <NavDropdown title="Finanza" id="basic-nav-dropdown">
+                  <>
+                    <NavDropdown.Item href="/movimientos">
+                      Movimientos
+                    </NavDropdown.Item>
+                    <NavDropdown.Item href="/cuentas-cobrar">
+                      Registrar pago
+                    </NavDropdown.Item>
+                    <NavDropdown.Item href="/gastos">
+                      Registrar gasto
+                    </NavDropdown.Item>
+                  </>
+                </NavDropdown>
+              ) : null}
               <NavDropdown title="Admin" id="basic-nav-dropdown">
                 <NavDropdown.Item href="/arbitros">Árbitros</NavDropdown.Item>
                 <NavDropdown.Item href="/estadios">Estadios</NavDropdown.Item>

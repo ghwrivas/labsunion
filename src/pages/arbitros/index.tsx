@@ -65,7 +65,12 @@ export const ArbitrosList: React.FC<{ user: User }> = ({ user }) => {
     setDatos(datos);
   }, [datos]);
 
-  if (error != null) return <div>Error cargando árbitros...</div>;
+  if (error != null) {
+    if (error.data && error.data.status === "forbidden") {
+      return <div>No tiene acceso a este modulo...</div>;
+    }
+    return <div>Error cargando árbitros...</div>;
+  }
   if (arbitros == null) return <div>Cargando...</div>;
 
   const handleInputChange = (event) => {
@@ -120,7 +125,7 @@ export const ArbitrosList: React.FC<{ user: User }> = ({ user }) => {
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>Árbitros</h4>
-        {user.role === "ADMIN" ? (
+        {user.role !== "ARBITRO" ? (
           <Button
             variant="link"
             style={{ float: "right" }}
@@ -165,13 +170,15 @@ export const ArbitrosList: React.FC<{ user: User }> = ({ user }) => {
                 </Col>
               </Row>
             </Container>
-            <Button
-              style={{ float: "right" }}
-              variant="link"
-              onClick={() => handleShow(arbitro)}
-            >
-              Editar
-            </Button>
+            {user.role !== "ARBITRO" ? (
+              <Button
+                style={{ float: "right" }}
+                variant="link"
+                onClick={() => handleShow(arbitro)}
+              >
+                Editar
+              </Button>
+            ) : null}
           </Card.Body>
         </Card>
       ))}

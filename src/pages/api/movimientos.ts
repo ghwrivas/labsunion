@@ -1,12 +1,16 @@
-import { MovimientoFinanza } from "@prisma/client";
+import { MovimientoFinanza, Role } from "@prisma/client";
 import { withIronSessionApiRoute } from "iron-session/next";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/db";
 import { sessionOptions } from "../../lib/session";
 
 async function movimientosRoute(req: NextApiRequest, res: NextApiResponse) {
-  if (!req.session.user) {
-    return res.status(401).json({ status: "unauthorized" });
+  if (
+    !req.session.user ||
+    ((req.session.user.role as Role) !== Role.PRESIDENTE &&
+      (req.session.user.role as Role) !== Role.TESORERO)
+  ) {
+    return res.status(403).json({ status: "forbidden" });
   }
   if (req.method === "GET") {
     const movimientos: MovimientoFinanza[] =

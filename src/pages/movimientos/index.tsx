@@ -8,8 +8,12 @@ import { Card, Col, Container, Row } from "react-bootstrap";
 import { getFormattedDate, getWeekDay } from "../../date-util";
 
 export const MovimientosList: React.FC<{ user: User }> = ({ user }) => {
+  if (user.role !== "PRESIDENTE" && user.role !== "TESORERO") {
+    return <div>No tiene acceso a este modulo...</div>;
+  }
   const { data: result, error } = useMovimientos();
-
+  if (error != null && error.data && error.data.status === "forbidden")
+    return <div>No tiene acceso a este modulo...</div>;
   if (error != null) return <div>Error cargando movimientos...</div>;
   if (result == null) return <div>Cargando...</div>;
 
@@ -34,8 +38,8 @@ export const MovimientosList: React.FC<{ user: User }> = ({ user }) => {
       <br></br>
       <h6>Movimientos</h6>
       <div>
-        {Object.keys(result.movimientos).map((fecha) => (
-          <>
+        {Object.keys(result.movimientos).map((fecha, index) => (
+          <Container key={index}>
             <Card.Subtitle>
               {getFormattedDate(fecha.substring(0, 10))}
             </Card.Subtitle>
@@ -63,7 +67,7 @@ export const MovimientosList: React.FC<{ user: User }> = ({ user }) => {
               </Card>
             ))}
             <br></br>
-          </>
+          </Container>
         ))}
       </div>
     </>

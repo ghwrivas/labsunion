@@ -5,7 +5,7 @@ import { Juego, JuegoCreateData, JuegoEditData } from "./types";
 const juegosPath = "/api/juegos";
 
 export const useJuegos = (fecha: string) =>
-  useSWR<Juego[]>(`${juegosPath}?fecha=${fecha}`);
+  useSWR<Juego[]>(`${juegosPath}?fecha=${fecha}`, fetchJson);
 
 export const findJuego = async (juegoId: string) => {
   return await fetchJson<Juego>(`${juegosPath}?juegoId=${juegoId}`, {

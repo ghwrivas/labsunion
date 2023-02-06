@@ -11,8 +11,12 @@ import { useEstadiosByActivo } from "../../api-estadios";
 import { createJuego } from "../../api-juegos";
 import Form from "react-bootstrap/Form";
 import { Button, ListGroup, Spinner } from "react-bootstrap";
+import { InferGetServerSidePropsType } from "next";
 
-export const JuegoCreateForm: React.FC = () => {
+export const JuegoCreateForm: React.FC<{ user: User }> = ({ user }) => {
+  if (user.role !== "PRESIDENTE" && user.role !== "COORDINADOR") {
+    return <div>No tiene acceso a este modulo...</div>;
+  }
   const router = useRouter();
   let {
     query: { fecha },
@@ -40,7 +44,12 @@ export const JuegoCreateForm: React.FC = () => {
   const { data: categorias, error: errorCategorias } = useCategoriasByActivo();
   const { data: estadios, error: errorEstadios } = useEstadiosByActivo();
 
-  if (errorArbitros != null) return <div>Error cargando árbitros...</div>;
+  if (errorArbitros != null) {
+    if (errorArbitros.data && errorArbitros.data.status === "forbidden") {
+      return <div>No tiene acceso a este modulo...</div>;
+    }
+    return <div>Error cargando árbitros...</div>;
+  }
   if (errorCategorias != null) return <div>Error cargando categorías...</div>;
   if (errorEstadios != null) return <div>Error cargando estadios...</div>;
   if (arbitros == null || categorias == null || estadios == null)
@@ -192,7 +201,7 @@ export const JuegoCreateForm: React.FC = () => {
           </option>
           {arbitros.map((arbitro) => (
             <option id={"" + arbitro.id} key={arbitro.id}>
-              {arbitro.nombre}
+              {arbitro.nombre} {arbitro.apellido}
             </option>
           ))}
         </Form.Select>
@@ -249,11 +258,13 @@ export const JuegoCreateForm: React.FC = () => {
   );
 };
 
-const Juegos = () => {
+const Juegos = ({
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <Layout>
       <main>
-        <JuegoCreateForm key="form" />
+        <JuegoCreateForm user={user} />
       </main>
     </Layout>
   );

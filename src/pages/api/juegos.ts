@@ -2,12 +2,15 @@ import {
   EstatusJuego,
   TipoCuentaCobrar,
   EstatusCuentaCobrar,
+  Role,
 } from "@prisma/client";
+import { withIronSessionApiRoute } from "iron-session/next";
+import { sessionOptions } from "../../lib/session";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../lib/db";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     const { fecha, juegoId } = req.query;
     if (juegoId) {
@@ -95,167 +98,222 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
     res.json(juegosCleaned);
   } else if (req.method === "POST") {
+    if (
+      !req.session.user ||
+      ((req.session.user.role as Role) !== Role.PRESIDENTE &&
+        (req.session.user.role as Role) !== Role.COORDINADOR)
+    ) {
+      return res.status(403).json({ status: "forbidden" });
+    }
     try {
       const { estadio, categoria, fecha, precio, arbitros } = JSON.parse(
         req.body
       );
       const fechaToDate = new Date(fecha as string);
 
-      const juego = await prisma.$transaction(async (tx) => {
-        const juego = await tx.juego.create({
-          data: {
-            estadio: {
-              connect: { id: Number(estadio) },
-            },
-            categoriaJuego: {
-              connect: {
-                id: Number(categoria),
+      const juego = await prisma.$transaction(
+        async (tx) => {
+          const juego = await tx.juego.create({
+            data: {
+              estadio: {
+                connect: { id: Number(estadio) },
               },
+              categoriaJuego: {
+                connect: {
+                  id: Number(categoria),
+                },
+              },
+              precio,
+              fecha: fechaToDate,
             },
-            precio,
-            fecha: fechaToDate,
-          },
-        });
+          });
 
-        if (arbitros.length) {
-          const data = arbitros.map((arbitro) => {
-            return { juegoId: juego.id, usuarioId: arbitro.id };
-          });
-          await tx.usuarioJuego.createMany({
-            data,
-          });
+          if (arbitros.length) {
+            const data = arbitros.map((arbitro) => {
+              return { juegoId: juego.id, usuarioId: arbitro.id };
+            });
+            await tx.usuarioJuego.createMany({
+              data,
+            });
+          }
+          return juego;
+        },
+        {
+          maxWait: 5000,
+          timeout: 10000,
         }
-        return juego;
-      });
+      );
       res.json(juego);
     } catch (error) {
       res.status(500).json({ status: "error" });
     }
   } else if (req.method === "PUT") {
+    if (
+      !req.session.user ||
+      ((req.session.user.role as Role) !== Role.PRESIDENTE &&
+        (req.session.user.role as Role) !== Role.COORDINADOR)
+    ) {
+      return res.status(403).json({ status: "forbidden" });
+    }
     try {
       const id = Number(req.query.juegoId);
       const { estadio, categoria, fecha, precio, arbitros } = JSON.parse(
         req.body
       );
       const fechaToDate = new Date(fecha as string);
-      const juego = await prisma.$transaction(async (tx) => {
-        const juego = await tx.juego.update({
-          where: {
-            id,
-          },
-          data: {
-            estadio: {
-              connect: { id: Number(estadio) },
+      const juego = await prisma.$transaction(
+        async (tx) => {
+          const juego = await tx.juego.update({
+            where: {
+              id,
             },
-            categoriaJuego: {
-              connect: {
-                id: Number(categoria),
+            data: {
+              estadio: {
+                connect: { id: Number(estadio) },
               },
+              categoriaJuego: {
+                connect: {
+                  id: Number(categoria),
+                },
+              },
+              precio,
+              fecha: fechaToDate,
             },
-            precio,
-            fecha: fechaToDate,
-          },
-        });
-
-        if (arbitros.length) {
-          await tx.usuarioJuego.deleteMany({ where: { juegoId: juego.id } });
-
-          const data = arbitros.map((arbitro) => {
-            return { juegoId: juego.id, usuarioId: arbitro.id };
           });
-          await tx.usuarioJuego.createMany({
-            data,
-          });
+
+          if (arbitros.length) {
+            await tx.usuarioJuego.deleteMany({ where: { juegoId: juego.id } });
+
+            const data = arbitros.map((arbitro) => {
+              return { juegoId: juego.id, usuarioId: arbitro.id };
+            });
+            await tx.usuarioJuego.createMany({
+              data,
+            });
+          }
+          return juego;
+        },
+        {
+          maxWait: 5000,
+          timeout: 10000,
         }
-        return juego;
-      });
+      );
       res.json(juego);
     } catch (error) {
       res.status(500).json({ status: "error" });
     }
   } else if (req.method === "DELETE") {
+    if (
+      !req.session.user ||
+      ((req.session.user.role as Role) !== Role.PRESIDENTE &&
+        (req.session.user.role as Role) !== Role.COORDINADOR)
+    ) {
+      return res.status(403).json({ status: "forbidden" });
+    }
     try {
       const juegoId = Number(req.query.juegoId);
-      await prisma.$transaction(async (tx) => {
-        const id = Number(juegoId);
-        const juego = await tx.juego.findFirst({
-          where: {
-            id,
-          },
-        });
-        if (juego.estatus === EstatusJuego.PROGRAMADO) {
-          await tx.juego.delete({ where: { id } });
+      await prisma.$transaction(
+        async (tx) => {
+          const id = Number(juegoId);
+          const juego = await tx.juego.findFirst({
+            where: {
+              id,
+            },
+          });
+          if (juego.estatus === EstatusJuego.PROGRAMADO) {
+            await tx.juego.delete({ where: { id } });
+          }
+        },
+        {
+          maxWait: 5000,
+          timeout: 10000,
         }
-      });
+      );
       res.json({ status: "ok" });
     } catch (error) {
       res.status(500).json({ status: "error" });
     }
   } else if (req.method === "PATCH") {
+    if (
+      !req.session.user ||
+      ((req.session.user.role as Role) !== Role.PRESIDENTE &&
+        (req.session.user.role as Role) !== Role.COORDINADOR)
+    ) {
+      return res.status(403).json({ status: "forbidden" });
+    }
     try {
       const juegoId = Number(req.query.juegoId);
       const { estatus } = JSON.parse(req.body);
-      await prisma.$transaction(async (tx) => {
-        const id = Number(juegoId);
-        const juego = await tx.juego.findFirst({
-          where: {
-            id,
-          },
-          include: {
-            usuarioJuegos: {
-              include: {
-                usuario: {},
+      await prisma.$transaction(
+        async (tx) => {
+          const id = Number(juegoId);
+          const juego = await tx.juego.findFirst({
+            where: {
+              id,
+            },
+            include: {
+              usuarioJuegos: {
+                include: {
+                  usuario: {},
+                },
               },
             },
-          },
-        });
-        if (
-          juego.estatus === EstatusJuego.PROGRAMADO ||
-          juego.estatus === EstatusJuego.SUSPENDIDO
-        ) {
-          await tx.juego.update({ where: { id }, data: { estatus } });
+          });
           if (
-            estatus === EstatusJuego.REALIZADO ||
-            estatus === EstatusJuego.REALIZADO_SIN_PAGO
+            juego.estatus === EstatusJuego.PROGRAMADO ||
+            juego.estatus === EstatusJuego.SUSPENDIDO
           ) {
-            // Crear cuenta por cobrar por arbitro
-            const periodo = await tx.periodo.findFirst({
-              where: {
-                activo: true,
-              },
-            });
-            for (let i = 0; i < juego.usuarioJuegos.length; i++) {
-              const cuentaCobrar = await tx.cuentaCobrar.create({
-                data: {
-                  monto: Number(juego.precio) * 0.1,
-                  descripcion: "Finanza por juego arbitrado",
-                  usuario: {
-                    connect: { id: juego.usuarioJuegos[i].usuarioId },
-                  },
-                  tipo: TipoCuentaCobrar.FINANZA_POR_JUEGO,
-                  periodo: {
-                    connect: { id: periodo.id },
-                  },
-                  estatus: EstatusCuentaCobrar.PENDIENTE,
+            await tx.juego.update({ where: { id }, data: { estatus } });
+            if (
+              estatus === EstatusJuego.REALIZADO ||
+              estatus === EstatusJuego.REALIZADO_SIN_PAGO
+            ) {
+              // Crear cuenta por cobrar por arbitro
+              const periodo = await tx.periodo.findFirst({
+                where: {
+                  activo: true,
                 },
               });
-              await tx.cuentaCobrarJuego.create({
-                data: {
-                  cuentaCobrar: {
-                    connect: { id: cuentaCobrar.id },
+              for (let i = 0; i < juego.usuarioJuegos.length; i++) {
+                const cuentaCobrar = await tx.cuentaCobrar.create({
+                  data: {
+                    monto: Number(juego.precio) * 0.1,
+                    descripcion: "Finanza por juego arbitrado",
+                    usuario: {
+                      connect: { id: juego.usuarioJuegos[i].usuarioId },
+                    },
+                    tipo: TipoCuentaCobrar.FINANZA_POR_JUEGO,
+                    periodo: {
+                      connect: { id: periodo.id },
+                    },
+                    estatus: EstatusCuentaCobrar.PENDIENTE,
                   },
-                  juego: {
-                    connect: { id: juego.id },
+                });
+                await tx.cuentaCobrarJuego.create({
+                  data: {
+                    cuentaCobrar: {
+                      connect: { id: cuentaCobrar.id },
+                    },
+                    juego: {
+                      connect: { id: juego.id },
+                    },
                   },
-                },
-              });
+                });
+              }
             }
           }
+        },
+        {
+          maxWait: 5000,
+          timeout: 10000,
         }
-      });
+      );
       res.json({ status: "ok" });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ status: "error" });
     }
   }
-};
+}
+
+export default withIronSessionApiRoute(juegosRoute, sessionOptions);
