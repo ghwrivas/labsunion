@@ -29,7 +29,7 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
   if (user.role !== "PRESIDENTE" && user.role !== "TESORERO") {
     return <div>No tiene acceso a este modulo...</div>;
   }
-  const [arbitroId, setArbitroId] = useState("");
+  const [arbitroId, setArbitroId] = useState("0");
   const [loading, setLoading] = useState(false);
   const [montoTotalCuentasCobrar, setMontoTotalCuentasCobrar] = useState(0);
   const [montoTotalAbonar, setMontoTotalAbonar] = useState(0);
@@ -84,6 +84,9 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
     const el = event.target.childNodes[index];
     const option = el.getAttribute("value") || "";
     setArbitroId(option);
+    setMontoTotalAbonar(0);
+    setAbonoCreateData([]);
+    setMontoTotalCuentasCobrar(0);
   };
 
   const handleCuentaCobrarChecked = (e, cuentaCobrar: CuentaCobrar) => {
@@ -110,7 +113,7 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
     setLoading(true);
     try {
       await createAbonos(abonoCreateData);
-      setArbitroId("");
+      setArbitroId("0");
       setMontoTotalAbonar(0);
       setAbonoCreateData([]);
       setMontoTotalCuentasCobrar(0);
@@ -162,13 +165,13 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
                   <Col>
                     <Card.Subtitle>Total deuda</Card.Subtitle>
                     <Card.Text style={{ fontSize: "30px" }}>
-                      $ {montoTotalCuentasCobrar}
+                      $ {montoTotalCuentasCobrar.toFixed(2)}
                     </Card.Text>
                   </Col>
                   <Col>
                     <Card.Subtitle>Abonando</Card.Subtitle>
                     <Card.Text style={{ fontSize: "30px" }}>
-                      $ {montoTotalAbonar}
+                      $ {montoTotalAbonar.toFixed(2)}
                     </Card.Text>
                   </Col>
                 </Row>
