@@ -14,7 +14,7 @@ import {
 } from "react-bootstrap";
 import { createAbonos } from "../api-abonos";
 import { useArbitrosByActivo } from "../api-arbitros";
-import { useCuentasCobrar } from "../api-cuentas-cobrar";
+import { useCuentasCobrarByUsuarioId } from "../api-cuentas-cobrar";
 import Layout from "../components/Layout";
 import { sessionOptions } from "../lib/session";
 import {
@@ -37,7 +37,7 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
     [] as AbonoCreateData[]
   );
   const { data: arbitros, error: errorArbitros } = useArbitrosByActivo();
-  const { data: cuentasCobrar, error } = useCuentasCobrar(arbitroId);
+  const { data: cuentasCobrar, error } = useCuentasCobrarByUsuarioId(arbitroId);
 
   useEffect(() => {
     setMontoTotalAbonar(montoTotalAbonar);
@@ -226,7 +226,7 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
 };
 
 const getFormatedDate = (fecha: string) => {
-  return fecha.substring(0, 10)
+  return fecha.substring(0, 10);
 };
 
 const getFormatedHour = (fecha: string) => {

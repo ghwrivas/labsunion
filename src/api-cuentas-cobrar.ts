@@ -1,10 +1,17 @@
 import useSWR from "swr";
 import fetchJson from "./lib/fetchJson";
-import { CuentaCobrar, CuentaCobrarCreateData } from "./types";
+import {
+  CuentaCobrar,
+  CuentaCobrarArbitro,
+  CuentaCobrarCreateData,
+} from "./types";
 
 const cuentasCobrarPath = "/api/cuentas-cobrar";
 
-export const useCuentasCobrar = (usuarioId: string) =>
+export const useCuentasCobrar = () =>
+  useSWR<CuentaCobrarArbitro[]>(cuentasCobrarPath, fetchJson);
+
+export const useCuentasCobrarByUsuarioId = (usuarioId: string) =>
   useSWR<CuentaCobrar[]>(
     `${cuentasCobrarPath}?usuarioId=${usuarioId}`,
     fetchJson

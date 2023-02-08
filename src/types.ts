@@ -154,6 +154,14 @@ export interface CuentaCobrar {
   juego?: JuegoCuentaCobrar;
 }
 
+export interface CuentaCobrarArbitro {
+  id: number;
+  nombre: string;
+  apellido: string;
+  montoPagado: number;
+  montoPendiente: number;
+}
+
 export interface AbonoCreateData {
   cuentaCobrarId: number;
   tipo: TipoCuentaCobrar;

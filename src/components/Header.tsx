@@ -37,6 +37,9 @@ export default function Header() {
                     <NavDropdown.Item href="/movimientos">
                       Movimientos
                     </NavDropdown.Item>
+                    <NavDropdown.Item href="/cuentas-cobrar/list">
+                      Ver cuentas por cobrar
+                    </NavDropdown.Item>
                     <NavDropdown.Item href="/cuentas-cobrar">
                       Registrar pago
                     </NavDropdown.Item>
