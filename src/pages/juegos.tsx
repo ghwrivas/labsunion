@@ -166,7 +166,6 @@ async function handleDelete(juego: Juego) {
 }
 
 function getHoraJuego(fecha) {
-  const date = new Date(fecha);
   return fecha.substring(11, 16);
 }
 

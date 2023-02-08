@@ -226,13 +226,11 @@ export const CuentasCobrarList: React.FC<{ user: User }> = ({ user }) => {
 };
 
 const getFormatedDate = (fecha: string) => {
-  const date = new Date(fecha as string);
-  return date.toLocaleDateString();
+  return fecha.substring(0, 10)
 };
 
 const getFormatedHour = (fecha: string) => {
-  const date = new Date(fecha as string);
-  return date.toLocaleTimeString();
+  return fecha.substring(11, 16);
 };
 
 const CuentaCobrarItem: React.FC<{
