@@ -14,7 +14,7 @@ import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
 import { InferGetServerSidePropsType } from "next";
 
 function formatFecha(fecha: string) {
-  return `${fecha.substring(0, 10)}T${new Date(fecha).toLocaleTimeString()}`;
+  return `${fecha.substring(0, 10)}T${fecha.substring(11, 16)}`;
 }
 
 export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {

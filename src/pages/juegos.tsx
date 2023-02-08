@@ -167,7 +167,7 @@ async function handleDelete(juego: Juego) {
 
 function getHoraJuego(fecha) {
   const date = new Date(fecha);
-  return date.toLocaleTimeString().substring(0, 5);
+  return fecha.substring(11, 16);
 }
 
 const Juegos = ({
