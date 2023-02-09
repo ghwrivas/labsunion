@@ -100,6 +100,7 @@ export const CuentasCobrarCreateForm: React.FC<{ user: User }> = ({ user }) => {
           placeholder="Ej: 10"
           name="monto"
           min={1}
+          step={0.1}
           value={datos.monto}
           required
           onChange={handleInputChange}
@@ -124,7 +125,7 @@ export const CuentasCobrarCreateForm: React.FC<{ user: User }> = ({ user }) => {
             .filter((tipo) => tipo !== "FINANZA_POR_JUEGO")
             .map((tipo) => (
               <option value={"" + tipo} key={tipo}>
-                {tipo}
+                {TipoCuentaCobrar[tipo]}
               </option>
             ))}
         </Form.Select>

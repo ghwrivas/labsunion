@@ -59,6 +59,7 @@ export const GastoCreateForm: React.FC<{ user: User }> = ({ user }) => {
           placeholder="Ej: 10"
           name="monto"
           min={1}
+          step={0.1}
           value={datos.monto}
           required
           onChange={handleInputChange}

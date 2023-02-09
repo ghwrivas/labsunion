@@ -29,9 +29,10 @@ export enum EstatusJuego {
 
 export enum TipoCuentaCobrar {
   FINANZA_POR_JUEGO = "Finanza",
-  VENTA_DE_ARTICULO = "VENTA_DE_ARTICULO",
-  DEUDA_PERIODO_ANTERIOR = "DEUDA_PERIODO_ANTERIOR",
-  OTRO = "OTRO",
+  MULTA = "Multa",
+  VENTA_DE_ARTICULO = "Venta de artículo",
+  DEUDA_PERIODO_ANTERIOR = "Deuda periodo anterior",
+  OTRO = "Otro",
 }
 
 export enum EstatusCuentaCobrar {

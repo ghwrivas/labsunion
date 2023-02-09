@@ -133,6 +133,7 @@ enum Role {
 }
 
 enum TipoCuentaCobrar {
+  MULTA
   FINANZA_POR_JUEGO
   VENTA_DE_ARTICULO
   DEUDA_PERIODO_ANTERIOR
