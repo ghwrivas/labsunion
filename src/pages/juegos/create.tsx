@@ -10,8 +10,9 @@ import Layout from "../../components/Layout";
 import { useEstadiosByActivo } from "../../api-estadios";
 import { createJuego } from "../../api-juegos";
 import Form from "react-bootstrap/Form";
-import { Button, ListGroup, Spinner } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { InferGetServerSidePropsType } from "next";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 export const JuegoCreateForm: React.FC<{ user: User }> = ({ user }) => {
   if (user.role !== "PRESIDENTE" && user.role !== "COORDINADOR") {
@@ -27,6 +28,7 @@ export const JuegoCreateForm: React.FC<{ user: User }> = ({ user }) => {
   } else {
     fecha = new Date(fecha as string).toISOString().substring(0, 16);
   }
+
   const [loading, setLoading] = React.useState(false);
   const [datos, setDatos] = React.useState<JuegoCreateData>({
     fecha,
@@ -88,33 +90,10 @@ export const JuegoCreateForm: React.FC<{ user: User }> = ({ user }) => {
     });
   };
 
-  const handleArbitroSelectChange = (event) => {
-    const index = event.target.selectedIndex;
-    const el = event.target.childNodes[index];
-    const option = el.getAttribute("id");
-    if (!option) return;
-    const optionToNumber = Number(option);
-    const arbitroFound = datos.arbitros.find((arbitro) => {
-      return arbitro.id === optionToNumber;
-    });
-    if (arbitroFound) return;
-    const arbitro = arbitros.find((arbitro) => {
-      return arbitro.id === optionToNumber;
-    });
-    datos.arbitros.push(arbitro);
+  const handleArbitroSelectChange = (arbitros) => {
     setDatos({
       ...datos,
-      [event.target.name]: optionToNumber,
-    });
-  };
-
-  const eliminarArbitro = (id) => {
-    const arbitros = datos.arbitros.filter((arbitro) => {
-      return arbitro.id !== id;
-    });
-    datos.arbitros = arbitros;
-    setDatos({
-      ...datos,
+      arbitros,
     });
   };
 
@@ -158,7 +137,7 @@ export const JuegoCreateForm: React.FC<{ user: User }> = ({ user }) => {
         />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicDuracion">
-        <Form.Label>Duracion</Form.Label>
+        <Form.Label>Duración</Form.Label>
         <Form.Select
           name="duracion"
           required
@@ -213,46 +192,20 @@ export const JuegoCreateForm: React.FC<{ user: User }> = ({ user }) => {
         </Form.Select>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicArbitro">
-        <Form.Label>Agregar árbitros</Form.Label>
-        <Form.Select
-          name="arbitro"
-          aria-label="Default select example"
+        <Form.Label>Árbitros</Form.Label>
+        <Typeahead
+          id="basic-typeahead-single"
+          labelKey="nombreCompleto"
+          multiple
           onChange={handleArbitroSelectChange}
-        >
-          <option value={""} key="">
-            Seleccione
-          </option>
-          {arbitros.map((arbitro) => (
-            <option id={"" + arbitro.id} key={arbitro.id}>
-              {arbitro.nombre} {arbitro.apellido}
-            </option>
-          ))}
-        </Form.Select>
+          options={arbitros}
+          placeholder="Seleccione"
+          selected={datos.arbitros}
+        />
         <Form.Text className="text-muted">
           También puedes asignar los árbitros el dia de la coordinación.
         </Form.Text>
       </Form.Group>
-      {datos.arbitros.length ? (
-        <ListGroup>
-          {datos.arbitros.map((arbitro) => (
-            <ListGroup.Item key={arbitro.id}>
-              {arbitro.nombre} {arbitro.apellido}
-              <Button
-                style={{ float: "right" }}
-                variant="secondary"
-                type="button"
-                onClick={(event) => eliminarArbitro(arbitro.id)}
-              >
-                Eliminar
-              </Button>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
-      ) : (
-        <Form.Text className="text-muted">
-          No hay árbitros seleccionados.
-        </Form.Text>
-      )}
       <br></br>
       <div className="mx-auto .mt-1" style={{ width: "200px" }}>
         <Button

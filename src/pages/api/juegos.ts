@@ -130,6 +130,7 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
           id: usuarioJuego.usuario.id,
           nombre: usuarioJuego.usuario.nombre,
           apellido: usuarioJuego.usuario.apellido,
+          nombreCompleto: `${usuarioJuego.usuario.nombre} ${usuarioJuego.usuario.apellido}`,
         };
       });
       res.json(juegoCleaned);

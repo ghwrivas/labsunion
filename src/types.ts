@@ -44,6 +44,7 @@ export interface Arbitro {
   id: number;
   nombre: string;
   apellido: string;
+  nombreCompleto: string;
   fecha_nacimiento: Date;
   correo_electronico: string;
   role: Role;

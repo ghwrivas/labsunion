@@ -32,6 +32,7 @@ async function arbitrosRoute(req: NextApiRequest, res: NextApiResponse) {
         id: usuario.id,
         nombre: usuario.nombre,
         apellido: usuario.apellido,
+        nombreCompleto: `${usuario.nombre} ${usuario.apellido}`,
         fecha_nacimiento: usuario.fecha_nacimiento,
         correo_electronico: usuario.correo_electronico,
         role: usuario.role,

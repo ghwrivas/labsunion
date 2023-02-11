@@ -10,8 +10,9 @@ import Layout from "../../components/Layout";
 import { useEstadiosByActivo } from "../../api-estadios";
 import { editJuego, findJuego } from "../../api-juegos";
 import Link from "next/link";
-import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
+import { Button, Form, Spinner } from "react-bootstrap";
 import { InferGetServerSidePropsType } from "next";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 function formatFecha(fecha: string) {
   return `${fecha.substring(0, 10)}T${fecha.substring(11, 16)}`;
@@ -121,33 +122,10 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
     });
   };
 
-  const handleArbitroSelectChange = (event) => {
-    const index = event.target.selectedIndex;
-    const el = event.target.childNodes[index];
-    const option = el.getAttribute("id");
-    if (!option) return;
-    const optionToNumber = Number(option);
-    const arbitroFound = datos.arbitros.find((arbitro) => {
-      return arbitro.id === optionToNumber;
-    });
-    if (arbitroFound) return;
-    const arbitro = arbitros.find((arbitro) => {
-      return arbitro.id === optionToNumber;
-    });
-    datos.arbitros.push(arbitro);
+  const handleArbitroSelectChange = (arbitros) => {
     setDatos({
       ...datos,
-      [event.target.name]: optionToNumber,
-    });
-  };
-
-  const eliminarArbitro = (id) => {
-    const arbitros = datos.arbitros.filter((arbitro) => {
-      return arbitro.id !== id;
-    });
-    datos.arbitros = arbitros;
-    setDatos({
-      ...datos,
+      arbitros,
     });
   };
 
@@ -246,46 +224,20 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
         </Form.Select>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicArbitro">
-        <Form.Label>Agregar árbitros</Form.Label>
-        <Form.Select
-          name="arbitro"
-          aria-label="Default select example"
+        <Form.Label>Árbitros</Form.Label>
+        <Typeahead
+          id="basic-typeahead-single"
+          labelKey="nombreCompleto"
+          multiple
           onChange={handleArbitroSelectChange}
-        >
-          <option value={""} key="">
-            Seleccione
-          </option>
-          {arbitros.map((arbitro) => (
-            <option id={"" + arbitro.id} key={arbitro.id}>
-              {arbitro.nombre} {arbitro.apellido}
-            </option>
-          ))}
-        </Form.Select>
+          options={arbitros}
+          placeholder="Seleccione"
+          selected={datos.arbitros}
+        />
         <Form.Text className="text-muted">
           También puedes asignar los árbitros el dia de la coordinación.
         </Form.Text>
       </Form.Group>
-      {datos.arbitros.length ? (
-        <ListGroup>
-          {datos.arbitros.map((arbitro) => (
-            <ListGroup.Item key={arbitro.id}>
-              {arbitro.nombre} {arbitro.apellido}
-              <Button
-                style={{ float: "right" }}
-                variant="secondary"
-                type="button"
-                onClick={(event) => eliminarArbitro(arbitro.id)}
-              >
-                Eliminar
-              </Button>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
-      ) : (
-        <Form.Text className="text-muted">
-          No hay árbitros seleccionados.
-        </Form.Text>
-      )}
       <br></br>
       <div className="mx-auto .mt-1" style={{ width: "200px" }}>
         <Button
