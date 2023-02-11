@@ -36,6 +36,7 @@ export const ChangeStatusForm: React.FC<{ user: User }> = ({ user }) => {
   const [datos, setDatos] = React.useState<JuegoEditData>({
     id: "",
     fecha: "",
+    duracion: 0,
     categoria: "",
     estadio: "",
     estatus: "",
@@ -54,6 +55,7 @@ export const ChangeStatusForm: React.FC<{ user: User }> = ({ user }) => {
         categoria: String(juego.categoriaJuego.nombre),
         estadio: String(juego.estadio.nombre),
         estatus: juego.estatus,
+        duracion: juego.duracion,
         precio: juego.precio,
         arbitros: juego.arbitros,
       });
