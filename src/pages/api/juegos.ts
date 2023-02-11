@@ -10,6 +10,90 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../lib/db";
 
+const getUTCDate = (strDate) => {
+  if (strDate.length > 10) {
+    // formato con hora YYYY-MM-DDTHH:MM
+    const [subStrDate, subStrTime] = strDate.split("T");
+
+    const [yearStr, monthStr, dateStr] = subStrDate.split("-");
+
+    const intYear = parseInt(yearStr, 10);
+    const intMonth = parseInt(monthStr, 10);
+    const intDate = parseInt(dateStr, 10);
+
+    const [hourStr, minStr] = subStrTime.split(":");
+
+    const intHour = parseInt(hourStr, 10);
+    const intMin = parseInt(minStr, 10);
+
+    return new Date(
+      Date.UTC(intYear, intMonth - 1, intDate, intHour, intMin, 0, 0)
+    );
+  } else {
+    // formato YYYY-MM-DD
+    const [yearStr, monthStr, dateStr] = strDate.split("-");
+
+    const intYear = parseInt(yearStr, 10);
+    const intMonth = parseInt(monthStr, 10);
+    const intDate = parseInt(dateStr, 10);
+
+    return new Date(Date.UTC(intYear, intMonth - 1, intDate, 0, 0, 0, 0));
+  }
+};
+
+const isValidSchedule = async (fechaInicio, fechaFin, estadio, juegoId?) => {
+  if (juegoId) {
+    const count = await prisma.juego.count({
+      where: {
+        OR: [
+          {
+            fecha: {
+              lte: fechaFin,
+              gte: fechaInicio,
+            },
+          },
+          {
+            fechaFin: {
+              lte: fechaFin,
+              gte: fechaInicio,
+            },
+          },
+        ],
+        AND: {
+          estadioId: estadio,
+        },
+        NOT: {
+          id: juegoId,
+        },
+      },
+    });
+    return count === 0;
+  } else {
+    const count = await prisma.juego.count({
+      where: {
+        OR: [
+          {
+            fecha: {
+              lte: fechaFin,
+              gte: fechaInicio,
+            },
+          },
+          {
+            fechaFin: {
+              lte: fechaFin,
+              gte: fechaInicio,
+            },
+          },
+        ],
+        AND: {
+          estadioId: estadio,
+        },
+      },
+    });
+    return count === 0;
+  }
+};
+
 async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     const { fecha, juegoId } = req.query;
@@ -33,6 +117,9 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
       let juegoCleaned: any = {
         id: juego.id,
         fecha: juego.fecha,
+        fechaFin: juego.fechaFin,
+        duracion:
+          (juego.fechaFin.getTime() - juego.fecha.getTime()) / 1000 / 60,
         precio: Number(juego.precio),
         estatus: juego.estatus,
         estadio: { ...juego.estadio },
@@ -56,8 +143,8 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
     const juegos = await prisma.juego.findMany({
       where: {
         fecha: {
-          lte: new Date(`${fechaAsStr}T23:59:59.000Z`),
-          gte: new Date(`${fechaAsStr}T00:00:00.000Z`),
+          lte: getUTCDate(`${fechaAsStr}T23:59`),
+          gte: getUTCDate(`${fechaAsStr}T00:00`),
         },
       },
       include: {
@@ -82,6 +169,9 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
       let juegoCleaned: any = {
         id: juego.id,
         fecha: juego.fecha,
+        fechaFin: juego.fechaFin,
+        duracion:
+          (juego.fechaFin.getTime() - juego.fecha.getTime()) / 1000 / 60,
         precio: Number(juego.precio),
         estatus: juego.estatus,
         estadio: { ...juego.estadio },
@@ -106,17 +196,31 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ status: "forbidden" });
     }
     try {
-      const { estadio, categoria, fecha, precio, arbitros } = JSON.parse(
-        req.body
+      const { estadio, categoria, fecha, precio, arbitros, duracion } =
+        JSON.parse(req.body);
+
+      const estadioToNumber = Number(estadio);
+      const fechaInicio = getUTCDate(fecha as string);
+      const fechaFin = new Date(fechaInicio.getTime() + duracion * 60000);
+
+      const validSchedule = await isValidSchedule(
+        fechaInicio,
+        fechaFin,
+        estadioToNumber
       );
-      const fechaToDate = new Date(fecha as string);
+      if (!validSchedule) {
+        return res.status(409).json({
+          message:
+            "Existen juegos registrados en la misma fecha y hora en el estadio seleccionado",
+        });
+      }
 
       const juego = await prisma.$transaction(
         async (tx) => {
           const juego = await tx.juego.create({
             data: {
               estadio: {
-                connect: { id: Number(estadio) },
+                connect: { id: estadioToNumber },
               },
               categoriaJuego: {
                 connect: {
@@ -124,7 +228,8 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
                 },
               },
               precio,
-              fecha: fechaToDate,
+              fecha: fechaInicio,
+              fechaFin,
             },
           });
 
@@ -157,10 +262,26 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
     }
     try {
       const id = Number(req.query.juegoId);
-      const { estadio, categoria, fecha, precio, arbitros } = JSON.parse(
-        req.body
+      const { estadio, categoria, fecha, precio, arbitros, duracion } =
+        JSON.parse(req.body);
+      const estadioToNumber = Number(estadio);
+
+      const fechaInicio = getUTCDate(fecha as string);
+      const fechaFin = new Date(fechaInicio.getTime() + duracion * 60000);
+
+      const validSchedule = await isValidSchedule(
+        fechaInicio,
+        fechaFin,
+        estadioToNumber,
+        id
       );
-      const fechaToDate = new Date(fecha as string);
+      if (!validSchedule) {
+        return res.status(409).json({
+          message:
+            "Existen juegos registrados en la misma fecha y hora en el estadio seleccionado",
+        });
+      }
+
       const juego = await prisma.$transaction(
         async (tx) => {
           const juego = await tx.juego.update({
@@ -169,7 +290,7 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
             },
             data: {
               estadio: {
-                connect: { id: Number(estadio) },
+                connect: { id: estadioToNumber },
               },
               categoriaJuego: {
                 connect: {
@@ -177,7 +298,8 @@ async function juegosRoute(req: NextApiRequest, res: NextApiResponse) {
                 },
               },
               precio,
-              fecha: fechaToDate,
+              fecha: fechaInicio,
+              fechaFin,
             },
           });
 

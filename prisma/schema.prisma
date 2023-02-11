@@ -55,6 +55,7 @@ model Periodo {
 model Juego {
   id                     Int             @id @default(autoincrement())
   fecha                  DateTime        @db.Timestamp(3)
+  fechaFin               DateTime?       @db.Timestamp(3)
   precio                 Decimal         @db.Decimal(5,2)
   estadioId              Int 
   estadio                Estadio         @relation(fields: [estadioId], references: [id])

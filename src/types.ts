@@ -107,6 +107,7 @@ export interface Movimiento {
 
 export interface Juego {
   id: number;
+  duracion: number;
   fecha: string;
   precio: number;
   estatus: EstatusJuego;
@@ -117,6 +118,7 @@ export interface Juego {
 
 export interface JuegoCreateData {
   fecha: string;
+  duracion: number;
   estadio: string;
   categoria: string;
   precio: number;
@@ -130,6 +132,7 @@ export interface GastoCreateData {
 
 export interface JuegoEditData {
   id: string;
+  duracion: number,
   fecha: string;
   estadio: string;
   estatus?: string;
@@ -181,3 +184,15 @@ export interface ChangePasswordData {
   newPassword: string;
   verifyNewPassword: string;
 }
+
+export const DuracionJuego = [
+  { minutos: 60, text: "1 hora" },
+  { minutos: 90, text: "1 hora con 30 minutos" },
+  { minutos: 105, text: "1 hora con 45 minutos" },
+  { minutos: 150, text: "2 horas con 30 minutos" },
+  { minutos: 165, text: "2 horas con 45 minutos" },
+  { minutos: 180, text: "3 horas" },
+  { minutos: 210, text: "3 horas con 30 minutos" },
+  { minutos: 225, text: "3 horas con 45 minutos" },
+  { minutos: 240, text: "4 horas" },
+];

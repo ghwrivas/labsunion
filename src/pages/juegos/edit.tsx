@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useArbitrosByActivo } from "../../api-arbitros";
 import { useCategoriasByActivo } from "../../api-categorias";
 import { sessionOptions } from "../../lib/session";
-import { JuegoEditData } from "../../types";
+import { DuracionJuego, JuegoEditData } from "../../types";
 import { User } from "../api/user";
 import Layout from "../../components/Layout";
 import { useEstadiosByActivo } from "../../api-estadios";
@@ -31,6 +31,7 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
   const [errorLoadingJuego, setErrorLoadingJuego] = React.useState(false);
   const [datos, setDatos] = React.useState<JuegoEditData>({
     id: "",
+    duracion: 0,
     fecha: "",
     categoria: "",
     estadio: "",
@@ -45,6 +46,7 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
       setDatos({
         id: juegoId as string,
         fecha,
+        duracion: juego.duracion,
         categoria: String(juego.categoriaJuego.id),
         estadio: String(juego.estadio.id),
         precio: juego.precio,
@@ -157,7 +159,11 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
       alert("Juego guardado!!!");
       event.target.reset();
     } catch (error) {
-      alert("Ocurrió un error al guardar el juego");
+      if (error.data && error.data.message) {
+        alert(error.data.message);
+      } else {
+        alert("Ocurrió un error al guardar el juego");
+      }
     }
     setLoading(false);
   };
@@ -183,6 +189,24 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
           required
           onChange={handleInputChange}
         />
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="formBasicDuracion">
+        <Form.Label>Duracion</Form.Label>
+        <Form.Select
+          name="duracion"
+          required
+          value={datos.duracion}
+          onChange={handleSelectChange}
+        >
+          <option id={null} value="" key="">
+            Seleccione
+          </option>
+          {DuracionJuego.map((opt) => (
+            <option value={"" + opt.minutos} key={opt.minutos}>
+              {opt.text}
+            </option>
+          ))}
+        </Form.Select>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicEstadio">
         <Form.Label>Estadio</Form.Label>

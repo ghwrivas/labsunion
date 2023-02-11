@@ -14,23 +14,17 @@ export const findJuego = async (juegoId: string) => {
 };
 
 export const createJuego = async (juegoCreateData: JuegoCreateData) => {
-  const response = await fetch(juegosPath, {
+  return await fetchJson(juegosPath, {
     method: "POST",
     body: JSON.stringify({ ...juegoCreateData }),
   });
-  if (response.status === 500) {
-    throw new Error("error al crear juego");
-  }
 };
 
 export const editJuego = async (juegoEditData: JuegoEditData) => {
-  const response = await fetch(`${juegosPath}?juegoId=${juegoEditData.id}`, {
+  return await fetchJson(`${juegosPath}?juegoId=${juegoEditData.id}`, {
     method: "PUT",
     body: JSON.stringify({ ...juegoEditData }),
   });
-  if (response.status === 500) {
-    throw new Error("error al editar juego");
-  }
 };
 
 export const deleteJuego = async (juego: Juego) => {
