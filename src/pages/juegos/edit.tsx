@@ -250,7 +250,6 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
         <Form.Select
           name="arbitro"
           aria-label="Default select example"
-          required
           onChange={handleArbitroSelectChange}
         >
           <option value={""} key="">
@@ -258,7 +257,7 @@ export const JuegoEditForm: React.FC<{ user: User }> = ({ user }) => {
           </option>
           {arbitros.map((arbitro) => (
             <option id={"" + arbitro.id} key={arbitro.id}>
-              {arbitro.nombre}
+              {arbitro.nombre} {arbitro.apellido}
             </option>
           ))}
         </Form.Select>
