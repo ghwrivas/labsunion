@@ -217,7 +217,6 @@ export const JuegoCreateForm: React.FC<{ user: User }> = ({ user }) => {
         <Form.Select
           name="arbitro"
           aria-label="Default select example"
-          required
           onChange={handleArbitroSelectChange}
         >
           <option value={""} key="">
