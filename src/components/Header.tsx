@@ -12,24 +12,24 @@ export default function Header() {
 
   return (
     <header>
-      <Navbar bg="light" expand="lg">
+      <Navbar expand="lg" bg="dark" variant="dark">
         <Container>
           <Navbar.Brand href="/">LABSUNION</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/">Inicio</Nav.Link>
-              <NavDropdown title="Coordinación" id="basic-nav-dropdown">
-                <NavDropdown.Item href="/juegos">
-                  Buscar juegos
-                </NavDropdown.Item>
-                {user?.isLoggedIn &&
-                (user.role === "COORDINADOR" || user.role === "PRESIDENTE") ? (
+              {user?.isLoggedIn &&
+              (user.role === "COORDINADOR" || user.role === "PRESIDENTE") ? (
+                <NavDropdown title="Coordinación" id="basic-nav-dropdown">
+                  <NavDropdown.Item href="/juegos">
+                    Buscar juegos
+                  </NavDropdown.Item>
                   <NavDropdown.Item href="/juegos/create">
                     Crear juego
                   </NavDropdown.Item>
-                ) : null}
-              </NavDropdown>
+                </NavDropdown>
+              ) : null}
               {user?.isLoggedIn &&
               (user.role === "TESORERO" || user.role === "PRESIDENTE") ? (
                 <NavDropdown title="Finanza" id="basic-nav-dropdown">
@@ -52,54 +52,44 @@ export default function Header() {
                   </>
                 </NavDropdown>
               ) : null}
-              <NavDropdown title="Admin" id="basic-nav-dropdown">
-                <NavDropdown.Item href="/arbitros">Árbitros</NavDropdown.Item>
-                <NavDropdown.Item href="/estadios">Estadios</NavDropdown.Item>
-                <NavDropdown.Item href="/categorias">
-                  Categorías
-                </NavDropdown.Item>
-              </NavDropdown>
-            </Nav>
-          </Navbar.Collapse>
-          <Navbar.Collapse className="justify-content-end">
-            {user?.isLoggedIn === false && (
-              <Nav.Link href="/login" className="text-end">
-                Iniciar Sesión
-              </Nav.Link>
-            )}
-          </Navbar.Collapse>
-          <Navbar.Collapse className="justify-content-end">
-            {user?.isLoggedIn === true && (
-              <Nav>
+              {user?.isLoggedIn === true && (
+                <NavDropdown title="Admin" id="basic-nav-dropdown">
+                  <NavDropdown.Item href="/arbitros">Árbitros</NavDropdown.Item>
+                  <NavDropdown.Item href="/estadios">Estadios</NavDropdown.Item>
+                  <NavDropdown.Item href="/categorias">
+                    Categorías
+                  </NavDropdown.Item>
+                </NavDropdown>
+              )}
+              {user?.isLoggedIn === true && (
                 <NavDropdown title={user.nombre} id="basic-nav-dropdown">
                   <NavDropdown.Item href="/change-password">
                     Cambiar contraseña
                   </NavDropdown.Item>
+                  <NavDropdown.Item
+                    href="/api/logout"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      mutateUser(
+                        await fetchJson("/api/logout", { method: "POST" }),
+                        false
+                      );
+                      router.push("/login");
+                    }}
+                  >
+                    Salir
+                  </NavDropdown.Item>
                 </NavDropdown>
-              </Nav>
-            )}
-          </Navbar.Collapse>
-          <Navbar.Collapse className="justify-content-end">
-            {user?.isLoggedIn === true && (
-              <Nav.Link
-                href="/api/logout"
-                className="text-end"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  mutateUser(
-                    await fetchJson("/api/logout", { method: "POST" }),
-                    false
-                  );
-                  router.push("/login");
-                }}
-              >
-                Salir
-              </Nav.Link>
-            )}
+              )}
+              {user?.isLoggedIn === false && (
+                <Nav.Link href="/login" className="text-end">
+                  Login
+                </Nav.Link>
+              )}
+            </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <br></br>
     </header>
   );
 }

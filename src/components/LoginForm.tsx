@@ -39,7 +39,7 @@ export default function LoginForm({
           {errorMessage}
         </Alert>
       )}
-      <Button variant="primary" type="submit" disabled={loading}>
+      <Button variant="dark" type="submit" disabled={loading}>
         {loading ? (
           <div>
             <Spinner

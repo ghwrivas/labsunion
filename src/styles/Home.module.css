@@ -1,0 +1,120 @@
+.textunion {
+  color: #1EBBA3;
+}
+
+.landing{
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: table;
+  z-index: -1
+}
+
+.homewrap {
+  clip: rect(0, auto, auto, 0);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.homeinner {
+  background-image: url("/umpire.webp");
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.caption {
+  z-index: 1;
+  position: absolute;
+  top: 38%;
+  width: 100%;
+  max-width: 100%;
+}
+
+.caption h1 {
+  font-size: 4.5rem;
+  letter-spacing: .3rem;
+  text-shadow: .1rem .1rem .8rem black;
+  padding-bottom: 1rem;
+}
+
+.caption h3 {
+  font-size: 2.5rem;
+  text-shadow: .1rem .1rem .5rem black;
+  padding-bottom: 2rem;
+}
+
+.caption .btn-lg {
+  font-size: 1.1rem;
+  border-width: medium;
+  padding: .8rem 1.6rem;
+}
+
+/*============= MEDIA QUERIES =============*/
+
+/* Devices under 992px (lg) */
+@media(max-width: 991.98px){
+  .caption h1 {
+      font-size: 3.5rem;
+      letter-spacing: .2rem;
+      padding-bottom: .8rem;
+  }
+
+  .caption h3 {
+      font-size: 2.2rem;
+      padding-bottom: 1.7rem;
+  }
+
+  .caption .btn-lg {
+      font-size: 1rem;
+      padding: .7rem 1.2rem;
+  }
+
+}
+
+/* Devices under 768px (md) */
+@media(max-width: 767.98px){
+  .caption h1 {
+      font-size: 2.7rem;
+      letter-spacing: .15rem;
+      padding-bottom: .5rem;
+  }
+
+  .caption h3 {
+      font-size: 1.7rem;
+      padding-bottom: 1.2rem;
+  }
+
+  .caption .btn-lg {
+      padding: .6rem 1.1rem;
+  }
+
+}
+
+/* Devices under 576px (sm) */
+@media(max-width: 575.98px){
+  .caption h1 {
+      font-size: 1.9rem;
+      letter-spacing: .1rem;
+      padding-bottom: .2rem;
+  }
+
+  .caption h3 {
+      font-size: 1.2rem;
+      padding-bottom: 1rem;
+  }
+
+  .caption .btn-lg {
+      font-size: .9rem;
+      padding: .4rem .9rem;
+  }
+
+}
