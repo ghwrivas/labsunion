@@ -4,3 +4,61 @@ html, body {
   color: #505962;
 }
 
+.offset:before {
+  content: "";
+  height: 4rem;
+  display: block;
+  margin-top: -4rem;
+}
+
+.card {
+  height: 100%;
+  border-radius: 0;
+  text-align: center;
+  margin: 0 1rem;
+  border: .1rem solid rgba(0, 0, 0, .075);
+  box-shadow: 0 0 .8rem rgba(0, 0, 0, .075);
+}
+
+/*-- TURN OFF WAYPOINTS/ANIMATION --*
+ .animated, .os-animation {
+	-webkit-animation: none!important;
+	-moz-animation: none!important;
+	-o-animation: none!important;
+	animation: none!important;
+	opacity: 1!important;
+	-webkit-animation-delay: none !important;
+	-moz-animation-delay: none !important;
+	animation-delay: none !important;
+	}
+
+/*-- TURN OFF WAYPOINTS/ANIMATION ON MOBILE --*
+@media (max-width: 767px) {
+.animated, .os-animation {
+	-webkit-animation: none!important;
+	-moz-animation: none!important;
+	-o-animation: none!important;
+	animation: none!important;
+	opacity: 1!important;
+	-webkit-animation-delay: none !important;
+	-moz-animation-delay: none !important;
+	animation-delay: none !important;
+	}
+}
+
+
+/*============= IF BOOTSTRAP FIXED NAVBAR IS JUMPING ON SCROLL =============*
+.fixed-top  {
+	-webkit-backface-visibility: hidden;
+}
+
+
+/*============= WAYPOINTS (DON'T CHANGE CSS BELOW) =============*/
+.os-animation{
+	opacity: 0;
+	margin: 0!important;
+	max-width: 100%;
+}
+.os-animation.animated {
+	opacity: 1;
+}
